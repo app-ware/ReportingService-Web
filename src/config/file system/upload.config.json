@@ -1,0 +1,19 @@
+{
+  "folders": {
+    "SharedFolder": "iCare",
+    "PhotoFolder": "icarephotos",
+    "SharedLinksFolder": "shared_links",
+    "WaterMarkFolder": "watermark",
+    "imagesVidrtualdirectory": "icarephotos"
+
+
+  },
+  "limits": {
+    "fileSize": 5242880,
+    "fileTypes": {
+      "images": ["image/jpeg", "image/png", "image/webp"],
+      "documents": ["application/pdf"]
+    }
+  },
+  "publicUrlPrefix": "/uploads"
+}
