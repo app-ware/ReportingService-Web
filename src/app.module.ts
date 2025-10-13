@@ -1,15 +1,3 @@
-// import { Module } from '@nestjs/common';
-// import { AppController } from './app.controller';
-// import { AppService } from './app.service';
-
-// @Module({
-//   imports: [],
-//   controllers: [AppController],
-//   providers: [AppService],
-// })
-// export class AppModule {}
-
-
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './common/json-respons-files/transform.interceptor';
@@ -20,6 +8,7 @@ import { HttpExceptionFilter } from './common/json-respons-files/http-exception.
 import { MssqlClientModule } from './config/mssql/mssql-client.module';
 import { AppLoggerModule } from './common/logger/logger.module';
 import { EvaluationReportsModule } from './modules/evaluation-report/evaluation-reports.module';
+import { SharedModule } from './common/shared/shared.module';
 
 
 
@@ -30,7 +19,7 @@ import { EvaluationReportsModule } from './modules/evaluation-report/evaluation-
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(icareDbConfig),
     TypeOrmModule.forRoot(isecureDbConfig),
-    MssqlClientModule,AppLoggerModule,
+    MssqlClientModule,AppLoggerModule,SharedModule,
 
     //Feature Modules  
     EvaluationReportsModule,
