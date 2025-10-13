@@ -1,89 +1,3 @@
-// import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-// import * as fs from 'fs/promises';
-// import * as path from 'path';
-// import * as handlebars from 'handlebars';
-// import { chromium, Browser, Page, PDFOptions } from 'playwright';
-
-
-// @Injectable()
-// export class PdfService implements OnModuleInit, OnModuleDestroy {
-//   private browser: Browser;
-
-//   async onModuleInit() {
-//     this.browser = await chromium.launch();
-//     await this.registerHandlebarsHelpers();
-//   }
-
-//   async onModuleDestroy() {
-//     if (this.browser) {
-//       await this.browser.close();
-//     }
-//   }
-
-//   private async registerHandlebarsHelpers() {
-//     handlebars.registerHelper('eq', (a, b) => a === b);
-//     handlebars.registerHelper('add', (a, b) => a + b);
-//     handlebars.registerHelper('lookup', (obj, field) => obj?.[field]);
-
-//     const partialPath = path.join(process.cwd(), 'src', 'templates', 'evaluation-reports', 'partials', 'node.hbs',);
-//     const partialTemplate = await fs.readFile(partialPath, 'utf-8');
-//     handlebars.registerPartial('node', partialTemplate);
-//   }
-
-//   async generatePdfFromTemplate<T extends { settings?: { footerImageBase64?: string | null, includeFooter?: boolean } }>
-//   (data: T): Promise<Buffer> {
-//     const templatePath = path.join(process.cwd(), 'src', 'templates', 'evaluation-reports', 'evaluation-report.hbs');
-//     const htmlTemplate = await fs.readFile(templatePath, 'utf-8');
-
-//     const template = handlebars.compile(htmlTemplate);
-//     const finalHtml = template(data);
-
-//     // let footerTemplate = '<div></div>'; // Default empty footer
-//     // if (data.settings?.includeFooter && data.settings?.footerImageBase64) {
-//     //   footerTemplate = `
-//     //             <div style="width: 100%; padding: 0 25px; box-sizing: border-box;">
-//     //                 <img src="${data.settings.footerImageBase64}" style="width: 100%; height: auto;" />
-//     //             </div>
-//     //         `;
-//     // }
-
-//     let page: Page | undefined;
-//     try {
-//       page = await this.browser.newPage();
-//       await page.setContent(finalHtml, { waitUntil: 'networkidle' });
-//       // const pdfBuffer = await page.pdf({
-//       //   format: 'A4',
-//       //   printBackground: true,
-//       //   margin: { top: '25px', right: '25px', bottom: '25px', left: '25px' },
-//       // });
-
-//               const pdfBuffer = await page.pdf({
-//             format: 'A4',
-//             printBackground: true,
-//             // 1. INCREASE margins to make space
-//             margin: { top: '100px', right: '25px', bottom: '100px', left: '25px' },
-//             // 2. ENABLE header/footer display
-//             displayHeaderFooter: true,
-//             // 3. PASS the footer template
-//             // footerTemplate: footerTemplate,
-//             // Keep header template empty as it's in the main HTML
-//             headerTemplate: '<div></div>' 
-//         });
-
-//       return pdfBuffer;
-//     } catch (error) {
-//       console.error('Error generating PDF:', error);
-//       throw new Error('Failed to generate PDF.');
-//     } finally {
-//       if (page) await page.close();
-//     }
-//   }
-// }
-// //#endregion
-
-
-
-
 //#region 1
 
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
@@ -113,7 +27,7 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
     handlebars.registerHelper('add', (a, b) => a + b);
     handlebars.registerHelper('lookup', (obj, field) => obj?.[field]);
 
-    const partialPath = path.join(process.cwd(), 'src', 'templates', 'evaluation-reports', 'partials', 'node.hbs',);
+    const partialPath = path.join(process.cwd(), 'src', 'templates', 'evaluation-reports','node.hbs',);
     const partialTemplate = await fs.readFile(partialPath, 'utf-8');
     handlebars.registerPartial('node', partialTemplate);
   }
