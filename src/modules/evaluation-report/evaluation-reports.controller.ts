@@ -49,9 +49,10 @@
 // }
 
 
-import { Controller, Post, Body, Res, Header } from '@nestjs/common';
+import { Controller, Post, Body, Res, Header, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { PdfService } from './pdf.service';
+import { InternalApiKeyGuard } from 'src/common/guards/internal-api-key.guard';
 
 @Controller('reports')
 export class ReportingController {
@@ -59,6 +60,7 @@ export class ReportingController {
 
   @Post('evaluation')
   @Header('Content-Type', 'application/pdf')
+  @UseGuards(InternalApiKeyGuard)
   async createEvaluationReport(@Body() templateData: any, @Res() res: Response) {
     const pdfBuffer = await this.pdfService.generatePdfFromTemplate(templateData);
     res.send(pdfBuffer);
