@@ -1,0 +1,72 @@
+{{#if (eq this.level 1)}}
+    <tr class="level-1">
+        <td colspan="{{add @root.terms.length 1}}" style="background-color: {{@root.variants.title_background_color}}; color: {{@root.variants.title_text_color}}; font-weight: bold;">
+            {{this.title}}
+        </td>
+    </tr>
+{{/if}}
+
+{{! Level 2 is a category }}
+{{#if (eq this.level 2)}}
+    <tr class="level-2">
+        <td colspan="{{add @root.terms.length 1}}" style="background-color: {{@root.variants.subtitle1_background_color}}; color: {{@root.variants.subtitle1_text_color}}; padding-left: 20px; font-weight: bold;">
+            {{this.title}}
+        </td>
+    </tr>
+{{/if}}
+
+{{! Level 3 can be a sub-category header or an item row }}
+{{#if (eq this.level 3)}}
+    {{#if this.children.length}}
+    <tr class="level-3-header">
+        <td colspan="{{add @root.terms.length 1}}" style="background-color: {{@root.variants.subtitle2_background_color}}; color: {{@root.variants.subtitle2_text_color}}; padding-left: 40px; font-style: italic;">
+            {{this.title}}
+        </td>
+    </tr>
+    {{else}}
+    <tr class="level-3-item">
+        <td style="padding-left: 40px;">{{this.title}}</td>
+        {{#each this.values}}
+            <td style="text-align: center;">{{this.value}}</td>
+        {{/each}}
+    </tr>
+    {{/if}}
+{{/if}}
+
+{{! Level 4 is always an item }}
+{{#if (eq this.level 4)}}
+    <tr class="level-4-item">
+        <td style="padding-left: 60px;">{{this.title}}</td>
+        {{#each this.values}}
+            <td style="text-align: center;">{{this.value}}</td>
+        {{/each}}
+    </tr>
+{{/if}}
+
+
+{{! STEP 2: RECURSIVELY CALL THE PARTIAL FOR ALL CHILDREN }}
+{{#each this.children}}
+    {{> node}}
+{{/each}}
+
+
+{{! STEP 3: AFTER ALL CHILDREN ARE RENDERED, CHECK IF THIS WAS A LEVEL 1 NODE AND IF IT HAS A REMARK }}
+{{#if (eq this.level 1)}}
+    {{#if this.remark}}
+    <tr>
+        <td colspan="{{add @root.terms.length 1}}" style="padding-left: 20px; font-style: italic; background-color: #f9f9f9; border-bottom: 2px solid #333;">
+            <small><strong>{{@root.variants.label_remark_node}}:</strong> {{this.remark}}</small>
+        </td>
+    </tr>
+    {{/if}}
+{{/if}}
+
+
+{{!-- {{#if (eq this.level 4)}}
+    <tr class="level-4-item">
+        <td style="padding-left: 60px;">{{this.title}}</td>
+        {{#each this.values}}
+            <td style="text-align: center;">{{this.value}}</td>
+        {{/each}}
+    </tr>
+{{/if}} --}}

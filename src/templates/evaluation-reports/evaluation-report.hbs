@@ -1,0 +1,1480 @@
+{{!--
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluation Report for {{student.name}}</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .header-row th {
+            color: {
+                    {
+                    reportStyles.termTitleTextColor
+                }
+            }
+
+            ;
+
+            background-color: {
+                    {
+                    reportStyles.termTitleBackgroundColor
+                }
+            }
+
+            ;
+        }
+
+        .subject-title {
+            color: {
+                    {
+                    reportStyles.titleTextColor
+                }
+            }
+
+            ;
+
+            background-color: {
+                    {
+                    reportStyles.titleBackgroundColor
+                }
+            }
+
+            ;
+        }
+    </style>
+</head>
+
+<body>
+
+    {{#if settings.useImages}}
+    {{> customHeader}}
+    {{else}}
+    <h1>Evaluation Report</h1>
+    <p><strong>Student:</strong> {{student.name}}</p>
+    <p><strong>Class:</strong> {{student.className}}</p>
+    <p><strong>Age:</strong> From {{student.ageFrom}} To {{student.ageTo}}</p>
+    {{/if}}
+
+    <table>
+        <thead>
+            <tr class="header-row">
+                <th style="width: 20%;">Subject</th>
+                <th style="width: {{reportStyles.itemColumnWidth}};">Item</th>
+
+                {{#each terms}}
+                <th style="text-align: center;">{{this.name}}</th>
+                {{/each}}
+            </tr>
+        </thead>
+        <tbody>
+
+            {{#each subjects}}
+            <tr>
+                <td class="subject-title" colspan="{{add ../terms.length 2}}">{{this.name}}</td>
+            </tr>
+
+            {{#each this.categories}}
+
+            {{#if this.name}}
+            <tr>
+                <td></td>
+                <td colspan="{{add ../../terms.length 1}}"><strong>{{this.name}}</strong></td>
+            </tr>
+            {{/if}}
+
+
+            {{#each this.items}}
+            <tr>
+                <td></td>
+                <td>{{this.name}}</td>
+                {{#each this.grades}}
+                <td style="text-align: center;">{{this}}</td>
+                {{/each}}
+            </tr>
+            {{/each}}
+
+
+            {{#each this.subcategories}}
+            <tr>
+                <td></td>
+                <td colspan="{{add ../../../terms.length 1}}"><em>{{this.name}}</em></td>
+            </tr>
+            {{#each this.items}}
+            <tr>
+                <td></td>
+                <td>{{this.name}}</td>
+                {{#each this.grades}}
+                <td style="text-align: center;">{{this}}</td>
+                {{/each}}
+            </tr>
+            {{/each}}
+            {{/each}}
+            {{/each}}
+            {{/each}}
+        </tbody>
+    </table>
+
+    <hr>
+    <h3>Remarks & Attendance</h3>
+
+    {{#each terms}}
+    {{#if this.remark}}
+    <p><strong>{{this.name}} Remark:</strong> {{this.remark}}</p>
+    {{/if}}
+    <p><strong>{{this.name}} Attendance:</strong> {{this.attendance}}</p>
+    {{/each}}
+
+
+    {{#if settings.includeFooter}}
+    <div class="page-break" style="page-break-before: always;"></div>
+    <h2>Legend</h2>
+    <table>
+        {{#each legend}}
+        <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.value}}</td>
+        </tr>
+        {{/each}}
+    </table>
+    {{/if}}
+
+</body>
+
+</html> --}}
+
+
+{{!--
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluation Report - {{student.name}}</title>
+    <style>
+        /* A4 Page Setup for Print */
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #2d3748;
+            background: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 15mm;
+        }
+
+        /* Header Section */
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8mm;
+            margin-bottom: 5mm;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .header-logo {
+            max-width: 70px;
+            max-height: 50px;
+        }
+
+        .header-content {
+            flex: 1;
+            text-align: center;
+            padding: 0 10mm;
+        }
+
+        .report-title {
+            font-size: 18pt;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 2mm;
+        }
+
+        .report-subtitle {
+            font-size: 10pt;
+            color: #64748b;
+        }
+
+        /* Student Info Section */
+        .student-info {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 4mm;
+            margin-bottom: 5mm;
+        }
+
+        .student-name {
+            font-size: 13pt;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 3mm;
+        }
+
+        .info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3mm;
+        }
+
+        .info-item {
+            flex: 1;
+            min-width: 35mm;
+            padding: 2mm;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-label {
+            font-size: 8pt;
+            color: #64748b;
+            margin-bottom: 1mm;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 9pt;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        /* Evaluation Table */
+        .eval-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5mm;
+            border: 1px solid #94a3b8;
+        }
+
+        .eval-table thead tr {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        .eval-table th {
+            padding: 3mm 2mm;
+            font-weight: 700;
+            text-align: center;
+            font-size: 10pt;
+            border: 1px solid #1e40af;
+        }
+
+        .eval-table th.subject-col {
+            width: 22%;
+            text-align: left;
+        }
+
+        .eval-table th.item-col {
+            text-align: left;
+        }
+
+        .eval-table tbody tr {
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .eval-table td {
+            padding: 2mm;
+            border: 1px solid #cbd5e1;
+            font-size: 9pt;
+        }
+
+        .subject-title-row td {
+            background-color: #dbeafe;
+            font-weight: 700;
+            font-size: 10pt;
+            color: #1e40af;
+            padding: 3mm 2mm;
+            text-align: left;
+            border: 1px solid #93c5fd;
+        }
+
+        .category-row td {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #475569;
+            padding: 2mm;
+            text-align: left;
+        }
+
+        .subcategory-row td {
+            background-color: #f8fafc;
+            font-style: italic;
+            color: #64748b;
+            padding: 2mm 2mm 2mm 6mm;
+            text-align: left;
+        }
+
+        .item-row td:first-child {
+            background-color: #fafafa;
+        }
+
+        .item-row td:nth-child(2) {
+            text-align: left;
+            padding-left: 4mm;
+        }
+
+        .grade-cell {
+            text-align: center;
+            font-weight: 700;
+            font-size: 10pt;
+            background-color: #ffffff;
+        }
+
+        /* Grade Colors */
+        .grade-1 {
+            color: #16a34a;
+        }
+
+        .grade-2 {
+            color: #2563eb;
+        }
+
+        .grade-3 {
+            color: #ca8a04;
+        }
+
+        .grade-4 {
+            color: #ea580c;
+        }
+
+        .grade-5 {
+            color: #dc2626;
+        }
+
+        /* Remarks Section */
+        .remarks-section {
+            margin-top: 5mm;
+            padding: 4mm;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+        }
+
+        .remarks-title {
+            font-size: 11pt;
+            color: #1e40af;
+            margin-bottom: 3mm;
+            font-weight: 700;
+            padding-bottom: 2mm;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .remark-item {
+            margin-bottom: 3mm;
+            padding: 2mm;
+            background-color: #ffffff;
+            border-left: 3px solid #2563eb;
+        }
+
+        .remark-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .remark-term {
+            font-weight: 700;
+            color: #1e40af;
+            font-size: 10pt;
+            margin-bottom: 1mm;
+        }
+
+        .remark-text {
+            color: #475569;
+            margin-bottom: 2mm;
+            line-height: 1.5;
+        }
+
+        .attendance-row {
+            display: flex;
+            align-items: center;
+            gap: 2mm;
+            font-size: 9pt;
+            color: #64748b;
+        }
+
+        .attendance-value {
+            background-color: #dbeafe;
+            color: #1e40af;
+            padding: 1mm 2mm;
+            border-radius: 2mm;
+            font-weight: 700;
+        }
+
+        /* Legend Section */
+        .legend-section {
+            margin-top: 5mm;
+            padding: 4mm;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+        }
+
+        .legend-title {
+            font-size: 11pt;
+            color: #1e40af;
+            margin-bottom: 3mm;
+            font-weight: 700;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2mm;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 2mm;
+            padding: 2mm;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            min-width: 32mm;
+        }
+
+        .legend-number {
+            width: 7mm;
+            height: 7mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 9pt;
+        }
+
+        .legend-number.grade-1 {
+            background-color: #16a34a;
+        }
+
+        .legend-number.grade-2 {
+            background-color: #2563eb;
+        }
+
+        .legend-number.grade-3 {
+            background-color: #ca8a04;
+        }
+
+        .legend-number.grade-4 {
+            background-color: #ea580c;
+        }
+
+        .legend-number.grade-5 {
+            background-color: #dc2626;
+        }
+
+        .legend-text {
+            font-size: 9pt;
+            color: #475569;
+        }
+
+        /* Print Optimization */
+        @media print {
+            body {
+                margin: 0;
+                padding: 15mm;
+            }
+
+            .eval-table {
+                page-break-inside: auto;
+            }
+
+            .eval-table tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            .subject-title-row {
+                page-break-after: avoid;
+            }
+
+            .remarks-section,
+            .legend-section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <div class="report-header">
+        {{#if settings.useImages}}
+        <img src="{{settings.logoUrl}}" alt="School Logo" class="header-logo">
+        {{else}}
+        <div style="width: 70px;"></div>
+        {{/if}}
+
+        <div class="header-content">
+            <h1 class="report-title">{{#if settings.reportTitle}}{{settings.reportTitle}}{{else}}Evaluation
+                Report{{/if}}</h1>
+            <p class="report-subtitle">Academic Performance Assessment</p>
+        </div>
+
+        <div style="width: 70px;"></div>
+    </div>
+
+    <!-- Student Information -->
+    <div class="student-info">
+        <div class="student-name">{{student.name}}</div>
+        <div class="info-row">
+            <div class="info-item">
+                <div class="info-label">Class</div>
+                <div class="info-value">{{student.className}}</div>
+            </div>
+            {{#if student.age}}
+            <div class="info-item">
+                <div class="info-label">Age</div>
+                <div class="info-value">{{student.age}}</div>
+            </div>
+            {{/if}}
+            <div class="info-item">
+                <div class="info-label">From</div>
+                <div class="info-value">{{student.ageFrom}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">To</div>
+                <div class="info-value">{{student.ageTo}}</div>
+            </div>
+            {{#if student.teachers}}
+            <div class="info-item">
+                <div class="info-label">Teacher</div>
+                <div class="info-value">{{student.teachers}}</div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <!-- Evaluation Table -->
+    <table class="eval-table">
+        <thead>
+            <tr>
+                <th class="subject-col">Subject</th>
+                <th class="item-col">Item</th>
+                {{#each terms}}
+                <th>{{this.name}}</th>
+                {{/each}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#each subjects}}
+            <!-- Subject Title Row -->
+            <tr class="subject-title-row">
+                <td colspan="{{#if ../terms}}{{add ../terms.length 2}}{{else}}2{{/if}}">{{this.name}}</td>
+            </tr>
+
+            {{#each this.categories}}
+            <!-- Category Row -->
+            {{#if this.name}}
+            <tr class="category-row">
+                <td></td>
+                <td colspan="{{#if ../../terms}}{{add ../../terms.length 1}}{{else}}1{{/if}}">{{this.name}}</td>
+            </tr>
+            {{/if}}
+
+            <!-- Category Items -->
+            {{#each this.items}}
+            <tr class="item-row">
+                <td></td>
+                <td>{{this.name}}</td>
+                {{#each this.grades}}
+                <td class="grade-cell grade-{{this}}">{{this}}</td>
+                {{/each}}
+            </tr>
+            {{/each}}
+
+            <!-- Subcategories -->
+            {{#each this.subcategories}}
+            <tr class="subcategory-row">
+                <td></td>
+                <td colspan="{{#if ../../../terms}}{{add ../../../terms.length 1}}{{else}}1{{/if}}">{{this.name}}</td>
+            </tr>
+            {{#each this.items}}
+            <tr class="item-row">
+                <td></td>
+                <td>{{this.name}}</td>
+                {{#each this.grades}}
+                <td class="grade-cell grade-{{this}}">{{this}}</td>
+                {{/each}}
+            </tr>
+            {{/each}}
+            {{/each}}
+            {{/each}}
+            {{/each}}
+        </tbody>
+    </table>
+
+    <!-- Remarks and Attendance -->
+    <div class="remarks-section">
+        <div class="remarks-title">Remarks & Attendance</div>
+        {{#each terms}}
+        <div class="remark-item">
+            <div class="remark-term">{{this.name}}</div>
+            {{#if this.remark}}
+            <div class="remark-text">{{this.remark}}</div>
+            {{/if}}
+            <div class="attendance-row">
+                <span>Attendance:</span>
+                <span class="attendance-value">{{this.attendance}}</span>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    <!-- Legend -->
+    {{#if settings.includeFooter}}
+    <div class="legend-section">
+        <div class="legend-title">Grading Legend</div>
+        <div class="legend-items">
+            {{#each legend}}
+            <div class="legend-item">
+                <div class="legend-number grade-{{this.value}}">{{this.value}}</div>
+                <span class="legend-text">{{this.name}}</span>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    {{/if}}
+</body>
+
+</html> --}}
+
+
+
+{{!--
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluation Report - {{student.name}}</title>
+    <style>
+        @page {
+            size: A4;
+
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #1a1a1a;
+            background: #ffffff;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 0;
+            padding: 20mm;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #003087;
+        }
+
+        .header-logo {
+            width: 100px;
+            height: auto;
+        }
+
+        .header-content {
+            flex: 1;
+            text-align: center;
+        }
+
+        .report-title {
+            font-size: 20pt;
+            font-weight: 700;
+            color: #003087;
+            margin-bottom: 8px;
+        }
+
+        .report-subtitle {
+            font-size: 12pt;
+            color: #4a4a4a;
+        }
+
+        .student-info {
+            background: #f5f6f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #d1d1d1;
+        }
+
+        .student-info h2 {
+            font-size: 16pt;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: #003087;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            padding: 12px;
+            border-radius: 6px;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+        }
+
+        .info-label {
+            font-size: 10pt;
+            color: #4a4a4a;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .eval-table-wrapper {
+            margin-bottom: 25px;
+            overflow-x: auto;
+        }
+
+        .eval-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #d1d1d1;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .eval-table thead tr {
+            background: #003087;
+            color: #ffffff;
+        }
+
+        .eval-table th {
+            padding: 12px;
+            font-weight: 700;
+            text-align: center;
+            font-size: 11pt;
+            border-right: 1px solid #ffffff;
+        }
+
+        .eval-table th:last-child {
+            border-right: none;
+        }
+
+        .eval-table th.subject-col {
+            width: 25%;
+            text-align: left;
+        }
+
+        .eval-table th.item-col {
+            width: {
+                    {
+                    #if (eq terms.length 1)
+                }
+            }
+
+            50% {
+                    {
+                    else
+                }
+            }
+
+            35% {
+                    {
+                    /if
+                }
+            }
+
+            ;
+            text-align: left;
+        }
+
+        .eval-table th.term-col {
+            width: {
+                    {
+                    #if (eq terms.length 1)
+                }
+            }
+
+            25% {
+                    {
+                    else
+                }
+            }
+
+            20% {
+                    {
+                    /if
+                }
+            }
+
+            ;
+        }
+
+        .eval-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .eval-table td {
+            padding: 12px;
+            border-right: 1px solid #e0e0e0;
+            text-align: left;
+        }
+
+        .eval-table td:last-child {
+            border-right: none;
+        }
+
+        .subject-title-row td {
+            background: #e6e6e6;
+            font-weight: 700;
+            font-size: 12pt;
+            color: #003087;
+            padding: 14px;
+            border-bottom: 2px solid #003087;
+            text-align: left;
+        }
+
+        .category-row td {
+            background: #f5f6f5;
+            font-weight: 600;
+            color: #1a1a1a;
+            padding: 10px 12px;
+        }
+
+        .subcategory-row td {
+            background: #fafafa;
+            font-style: italic;
+            color: #4a4a4a;
+            padding: 8px 12px 8px 24px;
+        }
+
+        .item-row td {
+            padding: 10px 12px;
+            color: #1a1a1a;
+        }
+
+        .grade-cell {
+            text-align: center;
+            font-weight: 600;
+            font-size: 11pt;
+        }
+
+        .grade-excellent {
+            color: #2e7d32;
+        }
+
+        .grade-very-good {
+            color: #0288d1;
+        }
+
+        .grade-good {
+            color: #f57c00;
+        }
+
+        .grade-fair {
+            color: #d81b60;
+        }
+
+        .grade-needs-improvement {
+            color: #c62828;
+        }
+
+        .grade-none {
+            color: #4a4a4a;
+        }
+
+        .remarks-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f5f6f5;
+            border-radius: 8px;
+            border-left: 4px solid #003087;
+        }
+
+        .remarks-section h3 {
+            font-size: 14pt;
+            color: #003087;
+            margin-bottom: 15px;
+        }
+
+        .remarks-grid {
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax({
+                        {
+                        #if (eq terms.length 1)
+                    }
+                }
+
+                100% {
+                        {
+                        else
+                    }
+                }
+
+                48% {
+                        {
+                        /if
+                    }
+                }
+
+                , 1fr));
+        gap: 15px;
+        }
+
+        .remark-card {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .remark-card h4 {
+            color: #003087;
+            font-size: 11pt;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .remark-text {
+            color: #1a1a1a;
+            line-height: 1.6;
+            font-size: 10pt;
+        }
+
+        .attendance-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10pt;
+            color: #4a4a4a;
+            margin-top: 10px;
+        }
+
+        .attendance-badge {
+            background: #e3f2fd;
+            color: #003087;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .legend-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #ffffff;
+            border: 1px solid #d1d1d1;
+            border-radius: 8px;
+        }
+
+        .legend-section h3 {
+            font-size: 13pt;
+            color: #003087;
+            margin-bottom: 15px;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: #f5f6f5;
+            border-radius: 6px;
+        }
+
+        .legend-badge {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 10pt;
+        }
+
+        .legend-badge.grade-1 {
+            background: #2e7d32;
+        }
+
+        .legend-badge.grade-2 {
+            background: #0288d1;
+        }
+
+        .legend-badge.grade-3 {
+            background: #f57c00;
+        }
+
+        .legend-badge.grade-4 {
+            background: #d81b60;
+        }
+
+        .legend-badge.grade-5 {
+            background: #c62828;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 20mm;
+            }
+
+            .eval-table {
+                page-break-inside: auto;
+            }
+
+            .eval-table tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="report-header">
+        {{#if settings.useImages}}
+        <img src="{{settings.logoUrl}}" alt="School Logo" class="header-logo">
+        {{else}}
+        <div style="width: 100px;"></div>
+        {{/if}}
+        <div class="header-content">
+            <h1 class="report-title">{{#if settings.reportTitle}}{{settings.reportTitle}}{{else}}Evaluation
+                Report{{/if}}</h1>
+            <p class="report-subtitle">{{student.className}}</p>
+        </div>
+        <div style="width: 100px;"></div>
+    </div>
+    <div class="student-info">
+        <h2>{{student.name}}</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Class</div>
+                <div class="info-value">{{student.className}}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Period</div>
+                <div class="info-value">{{student.ageFrom}} - {{student.ageTo}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="eval-table-wrapper">
+        <table class="eval-table">
+            <thead>
+                <tr>
+                    <th class="subject-col">Subject</th>
+                    <th class="item-col">Item</th>
+                    {{#each terms}}
+                    <th class="term-col">{{this.name}}</th>
+                    {{/each}}
+                </tr>
+            </thead>
+            <tbody>
+                {{#each subjects}}
+                <tr class="subject-title-row">
+                    <td colspan="{{add terms.length 2}}">{{this.name}}</td>
+                </tr>
+                {{#each this.categories}}
+                {{#if this.name}}
+                <tr class="category-row">
+                    <td></td>
+                    <td colspan="{{add ../terms.length 1}}">{{this.name}}</td>
+                </tr>
+                {{/if}}
+                {{#each this.items}}
+                <tr class="item-row">
+                    <td></td>
+                    <td>{{this.name}}</td>
+                    {{#each this.grades}}
+                    <td class="grade-cell grade-{{#if this}}{{this}}{{else}}none{{/if}}">{{#if
+                        this}}{{this}}{{else}}-{{/if}}</td>
+                    {{/each}}
+                </tr>
+                {{/each}}
+                {{#each this.subcategories}}
+                <tr class="subcategory-row">
+                    <td></td>
+                    <td colspan="{{add ../../terms.length 1}}">{{this.name}}</td>
+                </tr>
+                {{#each this.items}}
+                <tr class="item-row">
+                    <td></td>
+                    <td>{{this.name}}</td>
+                    {{#each this.grades}}
+                    <td class="grade-cell grade-{{#if this}}{{this}}{{else}}none{{/if}}">{{#if
+                        this}}{{this}}{{else}}-{{/if}}</td>
+                    {{/each}}
+                </tr>
+                {{/each}}
+                {{/each}}
+                {{/each}}
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    <div class="remarks-section">
+        <h3>Remarks & Attendance</h3>
+        <div class="remarks-grid">
+            {{#each terms}}
+            <div class="remark-card">
+                <h4>{{this.name}}</h4>
+                {{#if this.remark}}
+                <p class="remark-text">{{this.remark}}</p>
+                {{/if}}
+                <div class="attendance-info">
+                    <span>Attendance:</span>
+                    <span class="attendance-badge">{{this.attendance}}</span>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    {{#if settings.includeFooter}}
+    <div class="legend-section">
+        <h3>Grading Legend</h3>
+        <div class="legend-grid">
+            {{#each legend}}
+            <div class="legend-item">
+                <div class="legend-badge grade-{{this.value}}">{{this.value}}</div>
+                <span>{{this.name}}</span>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    {{/if}}
+</body>
+
+</html> --}}
+
+
+
+{{!--
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluation Report - {{childInfo.name}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        thead th {
+            background-color: #f2f2f2;
+        }
+
+        .full-width-image {
+            width: 100%;
+            height: auto;
+        }
+
+        .remark {
+            margin-top: 1em;
+            padding: 1em;
+            background-color: #f9f9f9;
+            border-left: 3px solid #ccc;
+        }
+
+        .student-info {
+            margin-bottom: 20px;
+        }
+
+        footer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    {{#if settings.useImages}}
+    <img src="{{settings.headerImageUrl}}" class="full-width-image" alt="Report Header">
+    {{else}}
+    <header>
+        <h1>Evaluation Report</h1>
+        <hr>
+        <div class="student-info">
+            <p><strong>Student:</strong> {{childInfo.name}} | <strong>Class:</strong> {{childInfo.class}}</p>
+            <p><strong>Period:</strong> {{childInfo.dateFrom}} to {{childInfo.dateTo}} |
+                <strong>Attendance:</strong> {{childInfo.attendance}}
+            </p>
+            <p><strong>Teacher(s):</strong> {{childInfo.teacher}}</p>
+        </div>
+    </header>
+    {{/if}}
+
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th
+                        style="background-color: {{variants.term_title_background_color}}; color: {{variants.term_title_text_color}};">
+                        Item</th>
+                    {{#each terms}}
+                    <th
+                        style="text-align: center; background-color: {{../variants.term_title_background_color}}; color: {{../variants.term_title_text_color}};">
+                        {{this.title}}</th>
+                    {{/each}}
+                </tr>
+            </thead>
+            <tbody>
+                {{#each nodes}}
+                {{> node}}
+                {{/each}}
+            </tbody>
+        </table>
+
+        {{#if globalRemark}}
+        <div class="remark">
+            <h4>Overall Remark</h4>
+            <p>{{globalRemark}}</p>
+        </div>
+        {{/if}}
+    </main>
+
+    {{#if settings.includeFooter}}
+    <footer>
+        <hr>
+        {{#if settings.useImages}}
+        <img src="{{settings.footerImageUrl}}" class="full-width-image" alt="Report Footer">
+        {{else}}
+        <h4>Legend</h4>
+        <div>
+            {{#each legend}}
+            <span style="margin-right: 15px;"><strong>{{this.value}}:</strong> {{this.text}}</span>
+            {{/each}}
+        </div>
+        {{/if}}
+    </footer>
+    {{/if}}
+</body>
+
+</html> --}}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluation Report - {{childInfo.name}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+        .student-info p {
+            margin: 4px 0;
+        }
+
+        .full-width-image {
+            width: 100%;
+            height: auto;
+        }
+
+        .remark {
+            margin-top: 1em;
+            padding: 1em;
+            background-color: #f9f9f9;
+            border-left: 3px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    {{#if settings.useImages}}
+            <h1 style="text-align: center;">Evaluation Report</h1>
+         {{!-- {{#if settings.headerImageBase64}}
+            <header>
+                <img src="{{settings.headerImageBase64}}" alt="Report Header" style="width: 100%; height: auto;" />
+            </header>
+        {{/if}} --}}
+    {{else}}
+            <h1>Evaluation Report</h1>
+
+    {{/if}}
+
+         <div>
+            <hr>
+            <div class="student-info"
+                style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                    gap: 8px 16px;
+                    background-color: #f9f9f9;
+                    padding: 10px 15px;
+                    border-radius: 10px;
+                    border: 1px solid #ddd;
+                    margin: 10px auto;
+                    width: 90%;
+                    font-family: Arial, sans-serif;
+                    font-size: 14px;
+                    color: #333;
+                ">
+
+                <div>
+                    <strong>{{variants.label_student_name}}</strong>
+                    <span>{{childInfo.name}}</span>
+                </div>
+
+                <div>
+                    <strong>{{variants.label_class}}</strong>
+                    <span>{{childInfo.class}}</span>
+                </div>
+
+                {{#if settings.showAge}}
+                <div>
+                    <strong>{{variants.label_age}}</strong>
+                    <span>
+                        {{childInfo.age}}
+                        ({{variants.label_from}} {{childInfo.dateFrom}} {{variants.label_to}} {{childInfo.dateTo}})
+                    </span>
+                </div>
+                {{/if}}
+
+                {{#if settings.showAttendance}}
+                <div>
+                    <strong>{{variants.label_attendance}}</strong>
+                    <span>{{childInfo.attendance}}</span>
+                </div>
+                {{/if}}
+
+                {{#if settings.showTeacher}}
+                <div>
+                    <strong>{{variants.label_teacher}}</strong>
+                    <span>{{childInfo.teacher}}</span>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+
+    <main>
+        <table>
+            <thead>
+                <tr
+                    style="background-color: {{variants.term_title_background_color}}; color: {{variants.term_title_text_color}};">
+                    <th>Item</th>
+                    {{#each terms}}
+                    <th style="text-align: center;">{{this.title}}</th>
+                    {{/each}}
+                </tr>
+            </thead>
+            <tbody>
+                {{#each nodes}}
+                {{> node}}
+                {{/each}}
+            </tbody>
+        </table>
+
+        {{#if globalRemark}}
+        <div class="global-remark" style="margin-top: 25px; padding: 12px; border: 1px solid #ccc; background-color: #f9f9f9; page-break-inside: avoid;">
+            <h4 style="margin-top: 0;">{{variants.label_remark_global}}</h4>
+            <p style="margin-bottom: 0;">{{globalRemark}}</p>
+        </div>
+        {{/if}}
+
+
+
+        {{#if legend}}
+        <div class="legend-section" style="margin-top: 25px; page-break-inside: avoid;">
+            <h4 style="text-align:center">{{variants.label_legend}}</h4>
+            <table style="margin: 0 auto; width: 40%; border-collapse: collapse;">
+                <tbody>
+                    {{#each legend}}
+                    <tr>
+                        <td>{{this.value}}:</td>
+                        <td>{{this.text}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+
+        </div>
+        {{/if}}
+    </main>
+</body>
+
+</html>
