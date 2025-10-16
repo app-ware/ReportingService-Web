@@ -47,3 +47,12 @@ export interface LegendItem {
   value: string;
   text: string;
 }
+
+export interface ReportDate {
+  
+  settings?: {
+    footerImageBase64?: string | null;
+    includeFooter?: boolean;
+    useImages?: boolean;
+    headerImageBase64?: string | null;
+}
