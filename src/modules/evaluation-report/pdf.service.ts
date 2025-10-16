@@ -21,7 +21,7 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly logger: PinoLogger) {
     this.logger.setContext(PdfService.name);
   }
-  
+
 
   async onModuleInit() {
     this.logger.info('Initializing PDF Service...');
@@ -54,11 +54,25 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
    * 2. The dedicated helper function for footer logic is restored for clarity (SRP).
    */
   private buildFooterOptions(data: ReportData): { footerTemplate: string; marginBottom: string } {
+
     const textFooterHtml = `
-      <div style="width: 100%; font-size: 9px; padding: 5px 25px 0; box-sizing: border-box; display: flex; justify-content: space-between; border-top: 1px solid #eee;">
-        <span>Evaluation Report</span>
-        <span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>
-      </div>`;
+    <div style="width: 100%; font-size: 9px; padding: 5px 25px 0; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
+    <span style="flex: 1; text-align: left;">
+      ${(() => {
+        const d = new Date();
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+      })()}
+    </span>
+    <span style="flex: 1; text-align: center;">Evaluation Report</span>
+    <span style="flex: 1; text-align: right;">
+      Page <span class="pageNumber"></span> of <span class="totalPages"></span>
+    </span>
+  </div>`;
+
+
 
     const hasImageFooter = data.settings?.includeFooter && data.settings?.footerImageBase64;
 
@@ -83,9 +97,9 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
 
   async generatePdfFromTemplate<T extends ReportData>(data: T): Promise<Buffer> {
     this.logger.info('Starting PDF generation...');
-    
+
     const templatePath = path.join(process.cwd(), 'src', 'templates', 'evaluation-reports', 'evaluation-report.hbs');
-    
+
     // Use an isolated browser context for each PDF generation.
     let context: BrowserContext | undefined;
 
@@ -106,14 +120,14 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
       };
 
       this.logger.debug('PDF options configured');
-      
+
       context = await this.browser.newContext();
       const page = await context.newPage();
       await page.setContent(finalHtml, { waitUntil: 'networkidle' });
-      
+
       const pdfBuffer = await page.pdf(pdfOptions);
       this.logger.info('PDF generated successfully ');
-      
+
       return pdfBuffer;
     } catch (error) {
       this.logger.error({ err: error }, 'Failed to generate PDF ');
