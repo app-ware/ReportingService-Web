@@ -18,7 +18,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       ? exception.getStatus()
       : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    const correlationId = (request as any).correlationId;
     this.logger.error({
+      correlationId: correlationId,
       err: exception, 
       message: `Error during ${request.method} ${request.url}`,
     });
@@ -54,7 +56,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       jsonapi: { version: '1.0' },
       meta: {
         apiVersion: '1.0',
-        requestId: uuidv4(),
+        requestId:(request as any).correlationId,
         timestamp: new Date().toISOString(),
       },
       data: null,

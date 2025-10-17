@@ -23,7 +23,7 @@ async intercept(context: ExecutionContext, next: CallHandler): Promise<Observabl
           const jsonapi = { version: "1.0" };
           const meta = {
             apiVersion: '1.0',
-            requestId: uuidv4(),
+            requestId: (request as any ).correlationId,
             timestamp: new Date().toISOString(),
           };
 

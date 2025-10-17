@@ -28,8 +28,9 @@ import pino from 'pino';
         level: process.env.NODE_ENV !== 'production' ? 'info' : 'debug',
 
         // custom context property to all HTTP request logs.
-        customProps: () => ({
+        customProps: (req) => ({
           context: 'HTTP',
+          correlationId:(req as any).correlationId,
         }),
         serializers: {
           err: pino.stdSerializers.err,
