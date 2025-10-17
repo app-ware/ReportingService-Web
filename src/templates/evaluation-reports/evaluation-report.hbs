@@ -111,10 +111,15 @@
                 <strong>{{variants.label_age}}</strong>
                 <span>
                     {{childInfo.age}}
-                    ({{variants.label_from}} {{childInfo.dateFrom}} {{variants.label_to}} {{childInfo.dateTo}})
                 </span>
             </div>
             {{/if}}
+
+            <div>
+                <span>
+                    <strong>{{variants.label_from}}: </strong>{{childInfo.dateFrom}}    |   <strong>{{variants.label_to}}: </strong>{{childInfo.dateTo}}
+                </span>
+            </div>
 
             {{#if settings.showAttendance}}
             <div>
@@ -134,15 +139,6 @@
 
     <main>
         <table>
-            <thead>
-                <tr
-                    style="background-color: {{variants.term_title_background_color}}; color: {{variants.term_title_text_color}};">
-                    <th>Item</th>
-                    {{#each terms}}
-                    <th style="text-align: center;">{{this.title}}</th>
-                    {{/each}}
-                </tr>
-            </thead>
             <tbody>
                 {{#each nodes}}
                 {{> node}}
@@ -162,13 +158,17 @@
 
         {{#if legend}}
         <div class="legend-section" style="margin-top: 25px; page-break-inside: avoid;">
-            <h4 style="text-align:center">{{variants.label_legend}}</h4>
             <table style="margin: 0 auto; width: 40%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                      <th colspan="2" style="text-align:center">{{variants.label_legend}}</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {{#each legend}}
                     <tr>
-                        <td>{{this.value}}:</td>
-                        <td>{{this.text}}</td>
+                        <td style="text-align:center; width:50%">{{this.value}}:</td>
+                        <td style="text-align:center ; width:50%">{{this.text}}</td>
                     </tr>
                     {{/each}}
                 </tbody>

@@ -1,8 +1,11 @@
+{{!-- level 1 --}}
 {{#if (eq this.level 1)}}
-    <tr class="level-1">
-        <td colspan="{{add @root.terms.length 1}}" style="background-color: {{@root.variants.title_background_color}}; color: {{@root.variants.title_text_color}}; font-weight: bold;">
-            {{this.title}}
-        </td>
+    <tr class="level-1" style="background-color: {{@root.variants.title_background_color}}; color: {{@root.variants.title_text_color}}; font-weight: bold;">
+        <td>{{this.title}}</td>
+
+        {{#each @root.terms}}
+            <td style="text-align: center;">{{this.title}}</td>
+        {{/each}}
     </tr>
 {{/if}}
 
@@ -44,29 +47,24 @@
 {{/if}}
 
 
-{{! STEP 2: RECURSIVELY CALL THE PARTIAL FOR ALL CHILDREN }}
+{{! RECURSIVELY CALL THE PARTIAL FOR ALL CHILDREN }}
 {{#each this.children}}
     {{> node}}
 {{/each}}
 
 
-{{! STEP 3: AFTER ALL CHILDREN ARE RENDERED, CHECK IF THIS WAS A LEVEL 1 NODE AND IF IT HAS A REMARK }}
+{{!AFTER ALL CHILDREN ARE RENDERED, CHECK IF THIS WAS A LEVEL 1 NODE AND IF IT HAS A REMARK }}
 {{#if (eq this.level 1)}}
     {{#if this.remark}}
     <tr>
-        <td colspan="{{add @root.terms.length 1}}" style="padding-left: 20px; font-style: italic; background-color: #f9f9f9; border-bottom: 2px solid #333;">
+        <td colspan="{{add @root.terms.length 1}}" style="padding-left: 20px; font-style: italic; background-color: #f9f9f9; border-bottom: 2px solid #e4e0e0;">
             <small><strong>{{@root.variants.label_remark_node}}:</strong> {{this.remark}}</small>
         </td>
     </tr>
     {{/if}}
+    <tr class="spacer-row">
+        <td colspan="{{add @root.terms.length 1}}" style="padding-top: 10px; border: none;"></td>
+    </tr>
 {{/if}}
 
 
-{{!-- {{#if (eq this.level 4)}}
-    <tr class="level-4-item">
-        <td style="padding-left: 60px;">{{this.title}}</td>
-        {{#each this.values}}
-            <td style="text-align: center;">{{this.value}}</td>
-        {{/each}}
-    </tr>
-{{/if}} --}}
