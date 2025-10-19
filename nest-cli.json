@@ -6,7 +6,7 @@
     "deleteOutDir": true,
     "assets": [
       "i18n/**/*",
-      { "include": "**/*.hbs", "watchAssets": true }
+      { "include": "**/*.hbs", "watchAssets": true,"outDir": "dist" }
     ]
   }
 }
