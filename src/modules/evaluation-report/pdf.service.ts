@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common';
 import { PinoLogger } from 'nestjs-pino';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -43,15 +43,14 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
     handlebars.registerHelper('eq', (a, b) => a === b);
     handlebars.registerHelper('add', (a, b) => a + b);
     handlebars.registerHelper('lookup', (obj, field) => obj?.[field]);
-
-    const partialPath = path.join(process.cwd(), 'src', 'templates', 'evaluation-reports', 'node.hbs');
+    const partialPath = path.join(__dirname, '..', '..', 'templates', 'evaluation-reports', 'node.hbs');
     const partialTemplate = await fs.readFile(partialPath, 'utf-8');
     handlebars.registerPartial('node', partialTemplate);
     this.logger.debug('Handlebars partials registered.');
   }
 
   /**
-   * 2. The dedicated helper function for footer logic is restored for clarity (SRP).
+   * The dedicated helper function for footer logic is restored for clarity (SRP).
    */
   private buildFooterOptions(data: ReportData): { footerTemplate: string; marginBottom: string } {
 
@@ -97,10 +96,8 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
 
   async generatePdfFromTemplate<T extends ReportData>(data: T): Promise<Buffer> {
     this.logger.info('Starting PDF generation...');
-
-    const templatePath = path.join(process.cwd(), 'src', 'templates', 'evaluation-reports', 'evaluation-report.hbs');
-
-    // Use an isolated browser context for each PDF generation.
+    
+    const templatePath = path.join(__dirname, '..', '..', 'templates', 'evaluation-reports', 'evaluation-report.hbs');
     let context: BrowserContext | undefined;
 
     try {
