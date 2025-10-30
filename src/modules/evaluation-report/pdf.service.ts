@@ -57,13 +57,7 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
     const textFooterHtml = `
     <div style="width: 100%; font-size: 9px; padding: 5px 25px 0; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee;">
     <span style="flex: 1; text-align: left;">
-      ${(() => {
-        const d = new Date();
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-      })()}
+      ${new Date().toLocaleDateString()}
     </span>
     <span style="flex: 1; text-align: center;">Evaluation Report</span>
     <span style="flex: 1; text-align: right;">
