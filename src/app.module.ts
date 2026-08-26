@@ -8,6 +8,7 @@ import { HttpExceptionFilter } from './common/json-respons-files/http-exception.
 import { MssqlClientModule } from './config/mssql/mssql-client.module';
 import { AppLoggerModule } from './common/logger/logger.module';
 import { EvaluationReportsModule } from './modules/evaluation-report/evaluation-reports.module';
+import { IncidentReportsModule } from './modules/incident-report/incident-reports.module';
 import { SharedModule } from './common/shared/shared.module';
 
 
@@ -21,8 +22,9 @@ import { SharedModule } from './common/shared/shared.module';
     TypeOrmModule.forRoot(isecureDbConfig),
     MssqlClientModule,AppLoggerModule,SharedModule,
 
-    //Feature Modules  
+    //Feature Modules
     EvaluationReportsModule,
+    IncidentReportsModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
