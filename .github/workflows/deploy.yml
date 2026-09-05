@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/reporting-service
+  IMAGE_NAME: ${{ github.repository_owner }}/reportingservice
 
 jobs:
   build-and-push:
