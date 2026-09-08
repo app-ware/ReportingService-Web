@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice - {{invoice.studentName}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        .first-page-header-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0 25px;
+            box-sizing: border-box;
+        }
+
+        .first-page-header-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .header-spacer {
+            height: 90px;
+        }
+
+        .info-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-block .issue-date {
+            grid-column: 1 / -1;
+            text-align: right;
+        }
+
+        table.fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+        }
+
+        table.fee-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        table.fee-table th,
+        table.fee-table td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+        table.fee-table td.amount {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        table.fee-table td.right {
+            text-align: right;
+        }
+
+        table.fee-table tr.total-row td {
+            border-top: 2px solid #333;
+        }
+
+        .amount-words {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    {{#if settings.useImages}}
+    {{#if settings.headerImageBase64}}
+    <div class="first-page-header-container">
+        <img src="{{settings.headerImageBase64}}" alt="Report Header" />
+    </div>
+
+    <div class="header-spacer"></div>
+    {{/if}}
+    {{/if}}
+
+    <div class="info-block">
+        <div><strong>Invoice No:</strong> {{invoice.invoiceNumber}}</div>
+        <div><strong>Parent :</strong> {{invoice.parentName}}</div>
+        <div><strong>Academic Year</strong> {{invoice.academicYearTitle}}</div>
+
+        <div><strong>Student ID:</strong> {{invoice.studentId}}</div>
+        <div><strong>Student :</strong> {{invoice.studentName}}</div>
+        <div><strong>Class :</strong> {{invoice.className}}</div>
+
+        <div class="issue-date"><strong>Issue Date:</strong> {{invoice.issueDate}}</div>
+    </div>
+
+    <table class="fee-table">
+        <thead>
+            <tr>
+                <th>Fee Description</th>
+                <th>Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each invoice.feeLines}}
+            <tr>
+                <td>{{this.title}}</td>
+                <td class="amount">{{this.amount}}</td>
+                <td></td>
+            </tr>
+            {{/each}}
+            {{#if invoice.discount}}
+            <tr>
+                <td class="right"><strong>{{invoice.discount.description}}</strong></td>
+                <td class="amount">{{invoice.discount.amount}}</td>
+                <td></td>
+            </tr>
+            {{/if}}
+            <tr>
+                <td class="right"><strong>VAT:</strong></td>
+                <td class="amount">{{invoice.vatAmount}}</td>
+                <td></td>
+            </tr>
+            <tr class="total-row">
+                <td class="right"><strong>Total:</strong></td>
+                <td class="amount"><strong>{{invoice.total}}</strong></td>
+                <td>{{invoice.currencyCode}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="amount-words"><strong>{{invoice.totalInWords}}</strong></p>
+
+</body>
+
+</html>
