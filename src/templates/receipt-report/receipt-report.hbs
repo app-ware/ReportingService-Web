@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt - {{receipt.studentName}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        .first-page-header-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0 25px;
+            box-sizing: border-box;
+        }
+
+        .first-page-header-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .header-spacer {
+            height: 90px;
+        }
+
+        .center-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .center-header img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .center-header .center-info h2 {
+            margin: 0 0 4px;
+        }
+
+        .center-header .center-info p {
+            margin: 2px 0;
+            font-size: 10pt;
+        }
+
+        .receipt-meta,
+        .receipt-parties {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        table.fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table.fee-table th,
+        table.fee-table td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+        table.fee-table td.amount {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .amount-words {
+            margin-top: 20px;
+        }
+
+        .payment-by {
+            margin-top: 16px;
+        }
+
+        .payment-by p {
+            margin: 4px 0 0;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding: 0 20px;
+        }
+
+        .signatures span {
+            font-weight: bold;
+        }
+
+        body.compact {
+            font-size: 8pt;
+        }
+
+        body.compact .center-header img {
+            width: 50px;
+            height: 50px;
+        }
+
+        body.compact .signatures {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body class="{{#if (eq settings.reportSize 'A5')}}compact{{/if}}">
+
+    {{#if settings.useImages}}
+    {{#if settings.headerImageBase64}}
+    <div class="first-page-header-container">
+        <img src="{{settings.headerImageBase64}}" alt="Report Header" />
+    </div>
+
+    <div class="header-spacer"></div>
+    {{/if}}
+    {{/if}}
+
+    <div class="center-header">
+        {{#if center.logoBase64}}
+        <img src="{{center.logoBase64}}" alt="Center Logo" onerror="this.style.display='none';" />
+        {{/if}}
+        <div class="center-info">
+            <h2>{{center.name}}</h2>
+            {{#if center.address}}
+            <p>{{center.address}}</p>
+            {{/if}}
+            {{#if center.landLine}}
+            <p>Phone: {{center.landLine}}</p>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="receipt-meta">
+        <div><strong>Receipt No:</strong> {{receipt.receiptNumber}}</div>
+        <div class="right"><strong>Date:</strong> {{receipt.date}}</div>
+    </div>
+
+    <div class="receipt-parties">
+        <div>
+            <div><strong>Parent Name:</strong> {{receipt.parentName}}</div>
+            <div><strong>Student Name:</strong> {{receipt.studentName}}</div>
+        </div>
+        <div class="right">
+            {{#if receipt.invoiceNumber}}
+            <div><strong>Invoice No:</strong> {{receipt.invoiceNumber}}</div>
+            {{/if}}
+            <div><strong>Invoice:</strong> {{receipt.description}}</div>
+        </div>
+    </div>
+
+    <table class="fee-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Currency</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{receipt.description}}</td>
+                <td class="amount">{{receipt.amount}}</td>
+                <td>{{receipt.currencyCode}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="amount-words"><strong>{{receipt.amountInWords}}</strong></p>
+
+    <div class="payment-by">
+        <span><strong>Payment by:</strong> {{receipt.paymentTypeTitle}}</span>
+        {{#if receipt.paymentNote}}
+        <p>{{receipt.paymentNote}}</p>
+        {{/if}}
+    </div>
+
+    <div class="signatures">
+        <span>Parent Signature</span>
+        <span>Accountant Signature</span>
+    </div>
+
+</body>
+
+</html>
