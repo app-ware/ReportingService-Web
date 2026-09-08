@@ -10,6 +10,7 @@ import { AppLoggerModule } from './common/logger/logger.module';
 import { EvaluationReportsModule } from './modules/evaluation-report/evaluation-reports.module';
 import { IncidentReportsModule } from './modules/incident-report/incident-reports.module';
 import { InvoiceReportsModule } from './modules/invoice-report/invoice-reports.module';
+import { ReceiptReportsModule } from './modules/receipt-report/receipt-reports.module';
 import { SharedModule } from './common/shared/shared.module';
 
 
@@ -27,6 +28,7 @@ import { SharedModule } from './common/shared/shared.module';
     EvaluationReportsModule,
     IncidentReportsModule,
     InvoiceReportsModule,
+    ReceiptReportsModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
