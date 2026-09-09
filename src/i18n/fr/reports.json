@@ -1,0 +1,71 @@
+{
+  "common": {
+    "phone": "Téléphone",
+    "yes": "Oui",
+    "no": "Non",
+    "at": "à",
+    "page": "Page",
+    "of": "sur",
+    "currency": "Devise",
+    "amount": "Montant",
+    "description": "Description",
+    "total": "Total"
+  },
+  "evaluation": {
+    "documentTitle": "Bulletin d'évaluation",
+    "heading": "Bulletin d'évaluation",
+    "studentName": "Nom de l'élève :",
+    "class": "Classe :",
+    "age": "Âge :",
+    "from": "Du",
+    "to": "Au",
+    "attendance": "Présence :",
+    "teacher": "Enseignant :",
+    "legend": "Légende",
+    "globalRemark": "Remarques",
+    "nodeRemark": "Remarque"
+  },
+  "incident": {
+    "documentTitle": "Rapport d'incident",
+    "heading": "Rapport d'incident",
+    "studentName": "Nom de l'élève :",
+    "incidentDate": "Date de l'incident :",
+    "incidentTime": "Heure de l'incident :",
+    "reportedBy": "Signalé par :",
+    "incidentTitle": "Intitulé de l'incident :",
+    "incidentDescription": "Description de l'incident :",
+    "parentContacted": "Parent contacté :",
+    "actionsTaken": "Mesures prises :",
+    "recommendedFollowUp": "Suivi recommandé :",
+    "managerSignature": "Signature du directeur",
+    "nurseSignature": "Signature de l'infirmier",
+    "parentSignature": "Signature du parent"
+  },
+  "invoice": {
+    "documentTitle": "Facture",
+    "footerTitle": "Facture",
+    "invoiceNumber": "Facture n° :",
+    "parent": "Parent :",
+    "academicYear": "Année scolaire",
+    "studentId": "Identifiant de l'élève :",
+    "student": "Élève :",
+    "class": "Classe :",
+    "issueDate": "Date d'émission :",
+    "feeDescription": "Description des frais",
+    "vat": "TVA :",
+    "total": "Total :"
+  },
+  "receipt": {
+    "documentTitle": "Reçu",
+    "footerTitle": "Reçu",
+    "receiptNumber": "Reçu n° :",
+    "date": "Date :",
+    "parentName": "Nom du parent :",
+    "studentName": "Nom de l'élève :",
+    "invoiceNumber": "Facture n° :",
+    "invoice": "Facture :",
+    "paymentBy": "Mode de paiement :",
+    "parentSignature": "Signature du parent",
+    "accountantSignature": "Signature du comptable"
+  }
+}

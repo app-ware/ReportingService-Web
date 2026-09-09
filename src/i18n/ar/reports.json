@@ -1,0 +1,71 @@
+{
+  "common": {
+    "phone": "هاتف",
+    "yes": "نعم",
+    "no": "لا",
+    "at": "في",
+    "page": "صفحة",
+    "of": "من",
+    "currency": "العملة",
+    "amount": "المبلغ",
+    "description": "الوصف",
+    "total": "الإجمالي"
+  },
+  "evaluation": {
+    "documentTitle": "تقرير التقييم",
+    "heading": "تقرير التقييم",
+    "studentName": "اسم الطالب:",
+    "class": "الصف:",
+    "age": "العمر:",
+    "from": "من",
+    "to": "إلى",
+    "attendance": "الحضور:",
+    "teacher": "المعلم:",
+    "legend": "المفتاح",
+    "globalRemark": "ملاحظات",
+    "nodeRemark": "ملاحظة"
+  },
+  "incident": {
+    "documentTitle": "تقرير حادث",
+    "heading": "تقرير حادث",
+    "studentName": "اسم الطالب:",
+    "incidentDate": "تاريخ الحادث:",
+    "incidentTime": "وقت الحادث:",
+    "reportedBy": "أبلغ عنه:",
+    "incidentTitle": "عنوان الحادث:",
+    "incidentDescription": "وصف الحادث:",
+    "parentContacted": "تم التواصل مع ولي الأمر:",
+    "actionsTaken": "الإجراءات المتخذة:",
+    "recommendedFollowUp": "المتابعة الموصى بها:",
+    "managerSignature": "توقيع المدير",
+    "nurseSignature": "توقيع الممرض",
+    "parentSignature": "توقيع ولي الأمر"
+  },
+  "invoice": {
+    "documentTitle": "فاتورة",
+    "footerTitle": "فاتورة",
+    "invoiceNumber": "رقم الفاتورة:",
+    "parent": "ولي الأمر:",
+    "academicYear": "العام الدراسي",
+    "studentId": "رقم الطالب:",
+    "student": "الطالب:",
+    "class": "الصف:",
+    "issueDate": "تاريخ الإصدار:",
+    "feeDescription": "وصف الرسوم",
+    "vat": "ضريبة القيمة المضافة:",
+    "total": "الإجمالي:"
+  },
+  "receipt": {
+    "documentTitle": "سند قبض",
+    "footerTitle": "سند قبض",
+    "receiptNumber": "رقم السند:",
+    "date": "التاريخ:",
+    "parentName": "اسم ولي الأمر:",
+    "studentName": "اسم الطالب:",
+    "invoiceNumber": "رقم الفاتورة:",
+    "invoice": "الفاتورة:",
+    "paymentBy": "طريقة الدفع:",
+    "parentSignature": "توقيع ولي الأمر",
+    "accountantSignature": "توقيع المحاسب"
+  }
+}

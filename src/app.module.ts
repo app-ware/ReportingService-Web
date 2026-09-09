@@ -1,30 +1,30 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { TransformInterceptor } from './common/json-respons-files/transform.interceptor';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { icareDbConfig, isecureDbConfig } from './config/database.config';
+import { TransformInterceptor } from './common/json-respons-files/transform.interceptor';
 import { HttpExceptionFilter } from './common/json-respons-files/http-exception.filter';
-import { MssqlClientModule } from './config/mssql/mssql-client.module';
 import { AppLoggerModule } from './common/logger/logger.module';
+import { SharedModule } from './common/shared/shared.module';
+import { RenderModule } from './common/render/render.module';
 import { EvaluationReportsModule } from './modules/evaluation-report/evaluation-reports.module';
 import { IncidentReportsModule } from './modules/incident-report/incident-reports.module';
 import { InvoiceReportsModule } from './modules/invoice-report/invoice-reports.module';
 import { ReceiptReportsModule } from './modules/receipt-report/receipt-reports.module';
-import { SharedModule } from './common/shared/shared.module';
 
-
-
-
+/**
+ * This service renders assembled report payloads into PDFs. It holds no database
+ * connections: the `TypeOrmModule.forRoot()` registrations and the MSSQL/tedious client
+ * modules that used to be wired here were only ever used by report code that has since
+ * moved to Nursery, which owns every query, authorization check and calculation.
+ */
 @Module({
   imports: [
-    //Common imports
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot(icareDbConfig),
-    TypeOrmModule.forRoot(isecureDbConfig),
-    MssqlClientModule,AppLoggerModule,SharedModule,
+    AppLoggerModule,
+    SharedModule,
+    RenderModule,
 
-    //Feature Modules
+    // Feature Modules
     EvaluationReportsModule,
     IncidentReportsModule,
     InvoiceReportsModule,
@@ -33,7 +33,6 @@ import { SharedModule } from './common/shared/shared.module';
   providers: [
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
-
-  ]
+  ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}" dir="{{dir}}">
 
 <head>
     <meta charset="UTF-8">
-    <title>Receipt - {{receipt.studentName}}</title>
+    <title>{{labels.report.documentTitle}} - {{receipt.studentName}}</title>
     <style>
+        {{{fontFaceCss}}}
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: {{fontStack}};
             font-size: 10pt;
         }
 
@@ -58,8 +60,8 @@
             margin-bottom: 10px;
         }
 
-        .right {
-            text-align: right;
+        .trailing {
+            text-align: end;
         }
 
         table.fee-table {
@@ -72,12 +74,14 @@
         table.fee-table td {
             border: 1px solid #ddd;
             padding: 6px 10px;
-            text-align: left;
+            text-align: start;
             word-wrap: break-word;
         }
 
+        /* See invoice-report.hbs: an amount keeps LTR ordering so bidi cannot rearrange it. */
         table.fee-table td.amount {
-            text-align: right;
+            direction: ltr;
+            text-align: end;
             white-space: nowrap;
         }
 
@@ -124,7 +128,7 @@
     {{#if settings.useImages}}
     {{#if settings.headerImageBase64}}
     <div class="first-page-header-container">
-        <img src="{{settings.headerImageBase64}}" alt="Report Header" />
+        <img src="{{settings.headerImageBase64}}" alt="" />
     </div>
 
     <div class="header-spacer"></div>
@@ -133,7 +137,8 @@
 
     <div class="center-header">
         {{#if center.logoBase64}}
-        <img src="{{center.logoBase64}}" alt="Center Logo" onerror="this.style.display='none';" />
+        {{! See incident-report.hbs — static onerror, the second branding safety net. }}
+        <img src="{{center.logoBase64}}" alt="" onerror="this.style.display='none';" />
         {{/if}}
         <div class="center-info">
             <h2>{{center.name}}</h2>
@@ -141,35 +146,35 @@
             <p>{{center.address}}</p>
             {{/if}}
             {{#if center.landLine}}
-            <p>Phone: {{center.landLine}}</p>
+            <p>{{labels.common.phone}}: {{center.landLine}}</p>
             {{/if}}
         </div>
     </div>
 
     <div class="receipt-meta">
-        <div><strong>Receipt No:</strong> {{receipt.receiptNumber}}</div>
-        <div class="right"><strong>Date:</strong> {{receipt.date}}</div>
+        <div><strong>{{labels.report.receiptNumber}}</strong> {{receipt.receiptNumber}}</div>
+        <div class="trailing"><strong>{{labels.report.date}}</strong> {{receipt.date}}</div>
     </div>
 
     <div class="receipt-parties">
         <div>
-            <div><strong>Parent Name:</strong> {{receipt.parentName}}</div>
-            <div><strong>Student Name:</strong> {{receipt.studentName}}</div>
+            <div><strong>{{labels.report.parentName}}</strong> {{receipt.parentName}}</div>
+            <div><strong>{{labels.report.studentName}}</strong> {{receipt.studentName}}</div>
         </div>
-        <div class="right">
+        <div class="trailing">
             {{#if receipt.invoiceNumber}}
-            <div><strong>Invoice No:</strong> {{receipt.invoiceNumber}}</div>
+            <div><strong>{{labels.report.invoiceNumber}}</strong> {{receipt.invoiceNumber}}</div>
             {{/if}}
-            <div><strong>Invoice:</strong> {{receipt.description}}</div>
+            <div><strong>{{labels.report.invoice}}</strong> {{receipt.description}}</div>
         </div>
     </div>
 
     <table class="fee-table">
         <thead>
             <tr>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Currency</th>
+                <th>{{labels.common.description}}</th>
+                <th>{{labels.common.amount}}</th>
+                <th>{{labels.common.currency}}</th>
             </tr>
         </thead>
         <tbody>
@@ -184,15 +189,15 @@
     <p class="amount-words"><strong>{{receipt.amountInWords}}</strong></p>
 
     <div class="payment-by">
-        <span><strong>Payment by:</strong> {{receipt.paymentTypeTitle}}</span>
+        <span><strong>{{labels.report.paymentBy}}</strong> {{receipt.paymentTypeTitle}}</span>
         {{#if receipt.paymentNote}}
         <p>{{receipt.paymentNote}}</p>
         {{/if}}
     </div>
 
     <div class="signatures">
-        <span>Parent Signature</span>
-        <span>Accountant Signature</span>
+        <span>{{labels.report.parentSignature}}</span>
+        <span>{{labels.report.accountantSignature}}</span>
     </div>
 
 </body>

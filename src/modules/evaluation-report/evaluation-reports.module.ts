@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ReportingController } from './evaluation-reports.controller';
-import { PdfService } from './pdf.service';
+import { EvaluationReportsService } from './evaluation-reports.service';
 
+/** Rendering infrastructure comes from the global `RenderModule` — see IncidentReportsModule. */
 @Module({
   controllers: [ReportingController],
-  providers: [PdfService],
+  providers: [EvaluationReportsService],
 })
 export class EvaluationReportsModule {}

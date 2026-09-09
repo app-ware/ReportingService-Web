@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}" dir="{{dir}}">
 
 <head>
     <meta charset="UTF-8">
-    <title>Evaluation Report - {{childInfo.name}}</title>
+    <title>{{labels.report.documentTitle}} - {{childInfo.name}}</title>
     <style>
+        {{{fontFaceCss}}}
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: {{fontStack}};
             font-size: 10pt;
         }
 
@@ -44,24 +46,64 @@
         td {
             border: 1px solid #ddd;
             padding: 6px;
-            text-align: left;
+            text-align: start;
             word-wrap: break-word;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 8px 16px;
+            background-color: #f9f9f9;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin: 10px auto;
+            width: 90%;
+            font-size: 14px;
+            color: #333;
         }
 
         .student-info p {
             margin: 4px 0;
         }
 
-        .full-width-image {
-            width: 100%;
-            height: auto;
+        /* Term columns are graded values, centered in both directions. */
+        .term-value {
+            text-align: center;
         }
 
-        .remark {
-            margin-top: 1em;
-            padding: 1em;
+        .global-remark {
+            margin-top: 25px;
+            padding: 12px;
+            border: 1px solid #ccc;
             background-color: #f9f9f9;
-            border-left: 3px solid #ccc;
+            page-break-inside: avoid;
+        }
+
+        .global-remark h4 {
+            margin-top: 0;
+        }
+
+        .global-remark p {
+            margin-bottom: 0;
+        }
+
+        .legend-section {
+            margin-top: 25px;
+            page-break-inside: avoid;
+        }
+
+        .legend-section table {
+            margin: 0 auto;
+            width: 40%;
+            border-collapse: collapse;
+        }
+
+        .legend-section td,
+        .legend-section th {
+            text-align: center;
+            width: 50%;
         }
     </style>
 </head>
@@ -71,66 +113,57 @@
     {{#if settings.useImages}}
     {{#if settings.headerImageBase64}}
     <div class="first-page-header-container">
-        <img src="{{settings.headerImageBase64}}" alt="Report Header" />
+        <img src="{{settings.headerImageBase64}}" alt="" />
     </div>
 
     <div class="header-spacer"></div>
     {{/if}}
     {{/if}}
 
-    <h1 style="text-align: center;">Evaluation Report</h1>
+    <h1 style="text-align: center;">{{labels.report.heading}}</h1>
     <div>
         <hr>
-        <div class="student-info" style="
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                    gap: 8px 16px;
-                    background-color: #f9f9f9;
-                    padding: 10px 15px;
-                    border-radius: 10px;
-                    border: 1px solid #ddd;
-                    margin: 10px auto;
-                    width: 90%;
-                    font-family: Arial, sans-serif;
-                    font-size: 14px;
-                    color: #333;
-                ">
+        {{!
+            Each label resolves to the center's own configured wording when it set any,
+            and to the localized default otherwise — see EvaluationReportsService.
+        }}
+        <div class="student-info">
 
             <div>
-                <strong>{{variants.label_student_name}}</strong>
+                <strong>{{label variants.label_student_name labels.report.studentName}}</strong>
                 <span>{{childInfo.name}}</span>
             </div>
 
             <div>
-                <strong>{{variants.label_class}}</strong>
+                <strong>{{label variants.label_class labels.report.class}}</strong>
                 <span>{{childInfo.class}}</span>
             </div>
 
             {{#if settings.showAge}}
             <div>
-                <strong>{{variants.label_age}}</strong>
-                <span>
-                    {{childInfo.age}}
-                </span>
+                <strong>{{label variants.label_age labels.report.age}}</strong>
+                <span>{{childInfo.age}}</span>
             </div>
             {{/if}}
 
             <div>
                 <span>
-                    <strong>{{variants.label_from}}: </strong>{{childInfo.dateFrom}}    |   <strong>{{variants.label_to}}: </strong>{{childInfo.dateTo}}
+                    <strong>{{label variants.label_from labels.report.from}}: </strong>{{childInfo.dateFrom}}
+                    &nbsp;|&nbsp;
+                    <strong>{{label variants.label_to labels.report.to}}: </strong>{{childInfo.dateTo}}
                 </span>
             </div>
 
             {{#if settings.showAttendance}}
             <div>
-                <strong>{{variants.label_attendance}}</strong>
+                <strong>{{label variants.label_attendance labels.report.attendance}}</strong>
                 <span>{{childInfo.attendance}}</span>
             </div>
             {{/if}}
 
             {{#if settings.showTeacher}}
             <div>
-                <strong>{{variants.label_teacher}}</strong>
+                <strong>{{label variants.label_teacher labels.report.teacher}}</strong>
                 <span>{{childInfo.teacher}}</span>
             </div>
             {{/if}}
@@ -147,28 +180,25 @@
         </table>
 
         {{#if globalRemark}}
-        <div class="global-remark"
-            style="margin-top: 25px; padding: 12px; border: 1px solid #ccc; background-color: #f9f9f9; page-break-inside: avoid;">
-            <h4 style="margin-top: 0;">{{variants.label_remark_global}}</h4>
-            <p style="margin-bottom: 0;">{{globalRemark}}</p>
+        <div class="global-remark">
+            <h4>{{label variants.label_remark_global labels.report.globalRemark}}</h4>
+            <p>{{globalRemark}}</p>
         </div>
         {{/if}}
 
-
-
         {{#if legend}}
-        <div class="legend-section" style="margin-top: 25px; page-break-inside: avoid;">
-            <table style="margin: 0 auto; width: 40%; border-collapse: collapse;">
+        <div class="legend-section">
+            <table>
                 <thead>
                     <tr>
-                      <th colspan="2" style="text-align:center">{{variants.label_legend}}</th>
+                        <th colspan="2">{{label variants.label_legend labels.report.legend}}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{#each legend}}
                     <tr>
-                        <td style="text-align:center; width:50%">{{this.value}}:</td>
-                        <td style="text-align:center ; width:50%">{{this.text}}</td>
+                        <td>{{this.value}}:</td>
+                        <td>{{this.text}}</td>
                     </tr>
                     {{/each}}
                 </tbody>

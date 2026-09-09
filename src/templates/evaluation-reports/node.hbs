@@ -1,10 +1,19 @@
-{{!-- level 1 --}}
+{{!--
+    Recursive partial for one evaluation node.
+
+    Indentation uses `padding-inline-start` rather than `padding-left` so the level
+    hierarchy mirrors correctly in Arabic. Colours come from the center's configured
+    `variants` palette, which the payload validator restricts to a known key allow-list —
+    these values are interpolated into inline `style` attributes.
+--}}
+
+{{! level 1 }}
 {{#if (eq this.level 1)}}
     <tr class="level-1" style="background-color: {{@root.variants.title_background_color}}; color: {{@root.variants.title_text_color}}; font-weight: bold;">
         <td>{{this.title}}</td>
 
         {{#each @root.terms}}
-            <td style="text-align: center;">{{this.title}}</td>
+            <td class="term-value">{{this.title}}</td>
         {{/each}}
     </tr>
 {{/if}}
@@ -12,7 +21,7 @@
 {{! Level 2 is a category }}
 {{#if (eq this.level 2)}}
     <tr class="level-2">
-        <td colspan="{{add @root.terms.length 1}}" style="background-color: {{@root.variants.subtitle1_background_color}}; color: {{@root.variants.subtitle1_text_color}}; padding-left: 20px; font-weight: bold;">
+        <td colspan="{{add @root.terms.length 1}}" style="background-color: {{@root.variants.subtitle1_background_color}}; color: {{@root.variants.subtitle1_text_color}}; padding-inline-start: 20px; font-weight: bold;">
             {{this.title}}
         </td>
     </tr>
@@ -22,15 +31,15 @@
 {{#if (eq this.level 3)}}
     {{#if this.children.length}}
     <tr class="level-3-header">
-        <td colspan="{{add @root.terms.length 1}}" style="background-color: {{@root.variants.subtitle2_background_color}}; color: {{@root.variants.subtitle2_text_color}}; padding-left: 40px; font-style: italic;">
+        <td colspan="{{add @root.terms.length 1}}" style="background-color: {{@root.variants.subtitle2_background_color}}; color: {{@root.variants.subtitle2_text_color}}; padding-inline-start: 40px; font-style: italic;">
             {{this.title}}
         </td>
     </tr>
     {{else}}
     <tr class="level-3-item">
-        <td style="padding-left: 40px;">{{this.title}}</td>
+        <td style="padding-inline-start: 40px;">{{this.title}}</td>
         {{#each this.values}}
-            <td style="text-align: center;">{{this.value}}</td>
+            <td class="term-value">{{this.value}}</td>
         {{/each}}
     </tr>
     {{/if}}
@@ -39,9 +48,9 @@
 {{! Level 4 is always an item }}
 {{#if (eq this.level 4)}}
     <tr class="level-4-item">
-        <td style="padding-left: 60px;">{{this.title}}</td>
+        <td style="padding-inline-start: 60px;">{{this.title}}</td>
         {{#each this.values}}
-            <td style="text-align: center;">{{this.value}}</td>
+            <td class="term-value">{{this.value}}</td>
         {{/each}}
     </tr>
 {{/if}}
@@ -53,12 +62,12 @@
 {{/each}}
 
 
-{{!AFTER ALL CHILDREN ARE RENDERED, CHECK IF THIS WAS A LEVEL 1 NODE AND IF IT HAS A REMARK }}
+{{! AFTER ALL CHILDREN ARE RENDERED, CHECK IF THIS WAS A LEVEL 1 NODE AND IF IT HAS A REMARK }}
 {{#if (eq this.level 1)}}
     {{#if this.remark}}
     <tr>
-        <td colspan="{{add @root.terms.length 1}}" style="padding-left: 20px; font-style: italic; background-color: #f9f9f9; border-bottom: 2px solid #e4e0e0;">
-            <small><strong>{{@root.variants.label_remark_node}}:</strong> {{this.remark}}</small>
+        <td colspan="{{add @root.terms.length 1}}" style="padding-inline-start: 20px; font-style: italic; background-color: #f9f9f9; border-bottom: 2px solid #e4e0e0;">
+            <small><strong>{{label @root.variants.label_remark_node @root.labels.report.nodeRemark}}:</strong> {{this.remark}}</small>
         </td>
     </tr>
     {{/if}}
@@ -66,5 +75,3 @@
         <td colspan="{{add @root.terms.length 1}}" style="padding-top: 10px; border: none;"></td>
     </tr>
 {{/if}}
-
-

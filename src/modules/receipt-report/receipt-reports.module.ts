@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ReceiptReportsController } from './receipt-reports.controller';
 import { ReceiptReportsService } from './receipt-reports.service';
-import { ReceiptReportPdfService } from './pdf.service';
 
+/** Rendering infrastructure comes from the global `RenderModule` — see IncidentReportsModule. */
 @Module({
   controllers: [ReceiptReportsController],
-  providers: [ReceiptReportsService, ReceiptReportPdfService],
+  providers: [ReceiptReportsService],
 })
 export class ReceiptReportsModule {}
