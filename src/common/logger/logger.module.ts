@@ -1,8 +1,14 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 import pino from 'pino';
 
-
+/**
+ * Global, and re-exporting `LoggerModule`, so that `PinoLogger` is injectable from any
+ * module. `nestjs-pino`'s `LoggerModule` is not global on its own, so wrapping it without
+ * re-exporting left `PinoLogger` resolvable only inside this module — every service
+ * outside it that injected the logger would fail to resolve at bootstrap.
+ */
+@Global()
 @Module({
   imports: [
     LoggerModule.forRoot({
@@ -47,6 +53,7 @@ import pino from 'pino';
       },
     }),
   ],
+  exports: [LoggerModule],
 })
 export class AppLoggerModule { }
 

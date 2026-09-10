@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}" dir="{{dir}}">
 
 <head>
     <meta charset="UTF-8">
-    <title>Incident Report - {{student.name}}</title>
+    <title>{{labels.report.documentTitle}} - {{student.name}}</title>
     <style>
+        {{{fontFaceCss}}}
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: {{fontStack}};
             font-size: 10pt;
         }
 
@@ -66,7 +68,7 @@
         td {
             border: 1px solid #ddd;
             padding: 6px;
-            text-align: left;
+            text-align: start;
             word-wrap: break-word;
         }
 
@@ -93,7 +95,7 @@
     {{#if settings.useImages}}
     {{#if settings.headerImageBase64}}
     <div class="first-page-header-container">
-        <img src="{{settings.headerImageBase64}}" alt="Report Header" />
+        <img src="{{settings.headerImageBase64}}" alt="" />
     </div>
 
     <div class="header-spacer"></div>
@@ -102,7 +104,9 @@
 
     <div class="center-header">
         {{#if center.logoBase64}}
-        <img src="{{center.logoBase64}}" alt="Center Logo" onerror="this.style.display='none';" />
+        {{! onerror is a static attribute of this template, not payload data — it is the
+            second, independent branding safety net Nursery's logo fallback relies on. }}
+        <img src="{{center.logoBase64}}" alt="" onerror="this.style.display='none';" />
         {{/if}}
         <div class="center-info">
             <h2>{{center.name}}</h2>
@@ -110,60 +114,61 @@
             <p>{{center.address}}</p>
             {{/if}}
             {{#if center.landLine}}
-            <p>Phone: {{center.landLine}}</p>
+            <p>{{labels.common.phone}}: {{center.landLine}}</p>
             {{/if}}
         </div>
     </div>
 
-    <h1 style="text-align: center;">Incident Report</h1>
+    <h1 style="text-align: center;">{{labels.report.heading}}</h1>
 
     <table>
         <tbody>
             <tr>
-                <th>Child Name:</th>
+                <th>{{labels.report.studentName}}</th>
                 <td>{{student.name}}</td>
             </tr>
             <tr>
-                <th>Date of Incident:</th>
+                <th>{{labels.report.incidentDate}}</th>
                 <td>{{incident.date}}</td>
             </tr>
             <tr>
-                <th>Time of Incident:</th>
+                <th>{{labels.report.incidentTime}}</th>
                 <td>{{incident.time}}</td>
             </tr>
             <tr>
-                <th>Reported by:</th>
+                <th>{{labels.report.reportedBy}}</th>
                 <td>{{incident.reportedByName}}</td>
             </tr>
             <tr>
-                <th>Incident Title:</th>
+                <th>{{labels.report.incidentTitle}}</th>
                 <td>{{incident.title}}</td>
             </tr>
             <tr>
-                <th>Incident Description:</th>
+                <th>{{labels.report.incidentDescription}}</th>
                 <td>{{incident.description}}</td>
             </tr>
             <tr>
-                <th>Parent Contacted:</th>
+                <th>{{labels.report.parentContacted}}</th>
                 <td>
-                    {{#if incident.parentContacted}}Yes at {{incident.parentContactTime}}{{else}}No{{/if}}
+                    {{#if incident.parentContacted}}{{labels.common.yes}}{{#if incident.parentContactTime}}
+                    {{labels.common.at}} {{incident.parentContactTime}}{{/if}}{{else}}{{labels.common.no}}{{/if}}
                 </td>
             </tr>
             <tr>
-                <th>Actions Taken:</th>
+                <th>{{labels.report.actionsTaken}}</th>
                 <td>{{incident.actionsTaken}}</td>
             </tr>
             <tr>
-                <th>Recommended Follow up:</th>
+                <th>{{labels.report.recommendedFollowUp}}</th>
                 <td>{{incident.recommendedFollowUp}}</td>
             </tr>
         </tbody>
     </table>
 
     <div class="signatures">
-        <span>Manager Signature</span>
-        <span>Nurse Signature</span>
-        <span>Parent Signature</span>
+        <span>{{labels.report.managerSignature}}</span>
+        <span>{{labels.report.nurseSignature}}</span>
+        <span>{{labels.report.parentSignature}}</span>
     </div>
 
 </body>

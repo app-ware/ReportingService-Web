@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}" dir="{{dir}}">
 
 <head>
     <meta charset="UTF-8">
-    <title>Invoice - {{invoice.studentName}}</title>
+    <title>{{labels.report.documentTitle}} - {{invoice.studentName}}</title>
     <style>
+        {{{fontFaceCss}}}
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: {{fontStack}};
             font-size: 10pt;
         }
 
@@ -38,7 +40,7 @@
 
         .info-block .issue-date {
             grid-column: 1 / -1;
-            text-align: right;
+            text-align: end;
         }
 
         table.fee-table {
@@ -56,17 +58,24 @@
         table.fee-table td {
             border: 1px solid #ddd;
             padding: 6px 10px;
-            text-align: left;
+            text-align: start;
             word-wrap: break-word;
         }
 
+        /*
+         * Amounts stay in the block's own direction and are aligned to the trailing edge,
+         * which mirrors correctly for Arabic. `direction: ltr` on the cell keeps a
+         * formatted number ("1,234.56 (10.00)") in the order Nursery produced it — an
+         * amount string must never be re-ordered by bidi resolution.
+         */
         table.fee-table td.amount {
-            text-align: right;
+            direction: ltr;
+            text-align: end;
             white-space: nowrap;
         }
 
-        table.fee-table td.right {
-            text-align: right;
+        table.fee-table td.label-cell {
+            text-align: end;
         }
 
         table.fee-table tr.total-row td {
@@ -84,7 +93,7 @@
     {{#if settings.useImages}}
     {{#if settings.headerImageBase64}}
     <div class="first-page-header-container">
-        <img src="{{settings.headerImageBase64}}" alt="Report Header" />
+        <img src="{{settings.headerImageBase64}}" alt="" />
     </div>
 
     <div class="header-spacer"></div>
@@ -92,22 +101,22 @@
     {{/if}}
 
     <div class="info-block">
-        <div><strong>Invoice No:</strong> {{invoice.invoiceNumber}}</div>
-        <div><strong>Parent :</strong> {{invoice.parentName}}</div>
-        <div><strong>Academic Year</strong> {{invoice.academicYearTitle}}</div>
+        <div><strong>{{labels.report.invoiceNumber}}</strong> {{invoice.invoiceNumber}}</div>
+        <div><strong>{{labels.report.parent}}</strong> {{invoice.parentName}}</div>
+        <div><strong>{{labels.report.academicYear}}</strong> {{invoice.academicYearTitle}}</div>
 
-        <div><strong>Student ID:</strong> {{invoice.studentId}}</div>
-        <div><strong>Student :</strong> {{invoice.studentName}}</div>
-        <div><strong>Class :</strong> {{invoice.className}}</div>
+        <div><strong>{{labels.report.studentId}}</strong> {{invoice.studentId}}</div>
+        <div><strong>{{labels.report.student}}</strong> {{invoice.studentName}}</div>
+        <div><strong>{{labels.report.class}}</strong> {{invoice.className}}</div>
 
-        <div class="issue-date"><strong>Issue Date:</strong> {{invoice.issueDate}}</div>
+        <div class="issue-date"><strong>{{labels.report.issueDate}}</strong> {{invoice.issueDate}}</div>
     </div>
 
     <table class="fee-table">
         <thead>
             <tr>
-                <th>Fee Description</th>
-                <th>Amount</th>
+                <th>{{labels.report.feeDescription}}</th>
+                <th>{{labels.common.amount}}</th>
                 <th></th>
             </tr>
         </thead>
@@ -121,18 +130,18 @@
             {{/each}}
             {{#if invoice.discount}}
             <tr>
-                <td class="right"><strong>{{invoice.discount.description}}</strong></td>
+                <td class="label-cell"><strong>{{invoice.discount.description}}</strong></td>
                 <td class="amount">{{invoice.discount.amount}}</td>
                 <td></td>
             </tr>
             {{/if}}
             <tr>
-                <td class="right"><strong>VAT:</strong></td>
+                <td class="label-cell"><strong>{{labels.report.vat}}</strong></td>
                 <td class="amount">{{invoice.vatAmount}}</td>
                 <td></td>
             </tr>
             <tr class="total-row">
-                <td class="right"><strong>Total:</strong></td>
+                <td class="label-cell"><strong>{{labels.report.total}}</strong></td>
                 <td class="amount"><strong>{{invoice.total}}</strong></td>
                 <td>{{invoice.currencyCode}}</td>
             </tr>

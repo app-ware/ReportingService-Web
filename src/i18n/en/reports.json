@@ -1,0 +1,71 @@
+{
+  "common": {
+    "phone": "Phone",
+    "yes": "Yes",
+    "no": "No",
+    "at": "at",
+    "page": "Page",
+    "of": "of",
+    "currency": "Currency",
+    "amount": "Amount",
+    "description": "Description",
+    "total": "Total"
+  },
+  "evaluation": {
+    "documentTitle": "Evaluation Report",
+    "heading": "Evaluation Report",
+    "studentName": "Student Name:",
+    "class": "Class:",
+    "age": "Age:",
+    "from": "From",
+    "to": "To",
+    "attendance": "Attendance:",
+    "teacher": "Teacher:",
+    "legend": "Legend",
+    "globalRemark": "Remarks",
+    "nodeRemark": "Remark"
+  },
+  "incident": {
+    "documentTitle": "Incident Report",
+    "heading": "Incident Report",
+    "studentName": "Student Name:",
+    "incidentDate": "Date of Incident:",
+    "incidentTime": "Time of Incident:",
+    "reportedBy": "Reported by:",
+    "incidentTitle": "Incident Title:",
+    "incidentDescription": "Incident Description:",
+    "parentContacted": "Parent Contacted:",
+    "actionsTaken": "Actions Taken:",
+    "recommendedFollowUp": "Recommended Follow up:",
+    "managerSignature": "Manager Signature",
+    "nurseSignature": "Nurse Signature",
+    "parentSignature": "Parent Signature"
+  },
+  "invoice": {
+    "documentTitle": "Invoice",
+    "footerTitle": "Invoice Report",
+    "invoiceNumber": "Invoice No:",
+    "parent": "Parent:",
+    "academicYear": "Academic Year",
+    "studentId": "Student ID:",
+    "student": "Student:",
+    "class": "Class:",
+    "issueDate": "Issue Date:",
+    "feeDescription": "Fee Description",
+    "vat": "VAT:",
+    "total": "Total:"
+  },
+  "receipt": {
+    "documentTitle": "Receipt",
+    "footerTitle": "Receipt",
+    "receiptNumber": "Receipt No:",
+    "date": "Date:",
+    "parentName": "Parent Name:",
+    "studentName": "Student Name:",
+    "invoiceNumber": "Invoice No:",
+    "invoice": "Invoice:",
+    "paymentBy": "Payment by:",
+    "parentSignature": "Parent Signature",
+    "accountantSignature": "Accountant Signature"
+  }
+}

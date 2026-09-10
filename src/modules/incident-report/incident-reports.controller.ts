@@ -1,20 +1,29 @@
-import { Controller, Post, Body, Res, Header, UseGuards } from '@nestjs/common';
+import { Body, Controller, Header, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { IncidentReportsService } from './incident-reports.service';
-import { IncidentReportTemplateData } from './dto/template-data.interface';
 import { InternalApiKeyGuard } from 'src/common/guards/internal-api-key.guard';
-import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
+import { CorrelationId } from 'src/common/decorators/correlation-id.decorator';
 
 @Controller('reports')
 export class IncidentReportsController {
   constructor(private readonly incidentReportsService: IncidentReportsService) {}
 
+  /**
+   * `@Body()` is intentionally untyped: the global `AppValidationPipe` cannot validate an
+   * interface-shaped body (it skips plain `Object` metatypes), so the report contract is
+   * enforced by `ReportPayloadValidator` inside the service instead — version-aware, and
+   * without changing the global validation policy for unrelated endpoints.
+   */
   @Post('incident')
-  @ResponseMessage("Pdf Generated Successfully from Reporting Service")
   @Header('Content-Type', 'application/pdf')
   @UseGuards(InternalApiKeyGuard)
-  async createIncidentReport(@Body() templateData: IncidentReportTemplateData, @Res() res: Response) {
-    const pdfBuffer = await this.incidentReportsService.createPdfFromData(templateData);
+  async createIncidentReport(
+    @Body() templateData: unknown,
+    @CorrelationId() correlationId: string | undefined,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer = await this.incidentReportsService.createPdfFromData(templateData, correlationId);
+    res.setHeader('Content-Length', pdfBuffer.length);
     res.send(pdfBuffer);
   }
 }
