@@ -18,7 +18,8 @@ import { EvaluationReportsService } from 'src/modules/evaluation-report/evaluati
 import { IncidentReportsService } from 'src/modules/incident-report/incident-reports.service';
 import { InvoiceReportsService } from 'src/modules/invoice-report/invoice-reports.service';
 import { ReceiptReportsService } from 'src/modules/receipt-report/receipt-reports.service';
-import { FIXTURES, TINY_PNG, incidentFixture, receiptFixture } from 'src/common/report-contract/test-fixtures';
+import { PaySlipReportsService } from 'src/modules/payslip-report/payslip-reports.service';
+import { FIXTURES, TINY_PNG, incidentFixture, paySlipFixture, receiptFixture } from 'src/common/report-contract/test-fixtures';
 
 /** Real Chromium renders take seconds, and this file does many of them. */
 jest.setTimeout(180_000);
@@ -71,6 +72,7 @@ describe('Report rendering (integration, real Chromium)', () => {
         IncidentReportsService,
         InvoiceReportsService,
         ReceiptReportsService,
+        PaySlipReportsService,
       ],
     }).compile();
 
@@ -89,6 +91,7 @@ describe('Report rendering (integration, real Chromium)', () => {
       incident: moduleRef.get(IncidentReportsService),
       invoice: moduleRef.get(InvoiceReportsService),
       receipt: moduleRef.get(ReceiptReportsService),
+      payslip: moduleRef.get(PaySlipReportsService),
     };
   });
 
@@ -96,7 +99,7 @@ describe('Report rendering (integration, real Chromium)', () => {
     await moduleRef?.close();
   });
 
-  const reportTypes: ReportType[] = ['evaluation', 'incident', 'invoice', 'receipt'];
+  const reportTypes: ReportType[] = ['evaluation', 'incident', 'invoice', 'receipt', 'payslip'];
 
   describe('every report renders a valid PDF in every locale', () => {
     const cases = reportTypes.flatMap((reportType) =>
@@ -150,6 +153,7 @@ describe('Report rendering (integration, real Chromium)', () => {
         incident: 'incident-report/incident-report.hbs',
         invoice: 'invoice-report/invoice-report.hbs',
         receipt: 'receipt-report/receipt-report.hbs',
+        payslip: 'payslip-report/payslip-report.hbs',
       }[reportType];
 
       return templates.render(templatePath, {
@@ -219,6 +223,24 @@ describe('Report rendering (integration, real Chromium)', () => {
       expect(markup).toContain('EGP');
       // Amount cells force LTR so bidi cannot rearrange them next to Arabic text.
       expect(markup).toContain('direction: ltr;');
+    });
+
+    it('prints every pay slip line and omits the deductions section when there are none', async () => {
+      const full = await html('payslip', 'en');
+
+      expect(full).toContain('Basic Salary');
+      expect(full).toContain('Transport allowance');
+      expect(full).toContain('Social insurance');
+      expect(full).toContain('9,600.00');
+
+      const noDeductions = await html(
+        'payslip',
+        'en',
+        paySlipFixture('en', { paySlip: { deductions: [], totalDeductions: '0.00' } }),
+      );
+
+      expect(noDeductions).not.toContain('Total Deductions:');
+      expect(noDeductions).toContain('Net Income:');
     });
 
     it('mixes Arabic content with Latin values without altering either', async () => {

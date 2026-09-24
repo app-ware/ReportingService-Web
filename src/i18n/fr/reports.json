@@ -67,5 +67,22 @@
     "paymentBy": "Mode de paiement :",
     "parentSignature": "Signature du parent",
     "accountantSignature": "Signature du comptable"
+  },
+  "payslip": {
+    "documentTitle": "Bulletin de paie",
+    "footerTitle": "Bulletin de paie",
+    "heading": "Bulletin de paie",
+    "employeeName": "Nom de l'employé :",
+    "employeeTitle": "Poste :",
+    "month": "Mois :",
+    "receiveDate": "Date de paiement :",
+    "earnings": "Gains",
+    "basicSalary": "Salaire de base",
+    "totalEarnings": "Total des gains :",
+    "deductions": "Retenues",
+    "totalDeductions": "Total des retenues :",
+    "netIncome": "Salaire net :",
+    "employeeSignature": "Signature de l'employé",
+    "accountantSignature": "Signature du comptable"
   }
 }

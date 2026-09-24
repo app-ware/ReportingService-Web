@@ -129,6 +129,38 @@ export const receiptReportSchema: ObjectSpec = obj({
 });
 
 // ---------------------------------------------------------------------------
+// Pay slip
+// ---------------------------------------------------------------------------
+
+const payLineSpec = obj({
+  title: str({ required: true, maxLength: SHORT_TEXT }),
+  amount: str({ required: true, maxLength: 64 }),
+});
+
+export const paySlipReportSchema: ObjectSpec = obj({
+  center: centerSpec,
+  settings: obj(bannerSettings, { required: true }),
+  paySlip: obj(
+    {
+      employeeName: str({ required: true, maxLength: SHORT_TEXT }),
+      employeeTitle: str({ nullable: true, maxLength: SHORT_TEXT }),
+      incomeMonth: str({ required: true, maxLength: 64 }),
+      receiveDate: str({ required: true, maxLength: 64 }),
+      currencyCode: str({ required: true, maxLength: 16 }),
+      // Same rule as the invoice: Nursery owns every amount and its display formatting.
+      salary: str({ required: true, maxLength: 64 }),
+      benefits: arr(payLineSpec, 200, { required: true }),
+      deductions: arr(payLineSpec, 200, { required: true }),
+      totalEarnings: str({ required: true, maxLength: 64 }),
+      totalDeductions: str({ required: true, maxLength: 64 }),
+      netIncome: str({ required: true, maxLength: 64 }),
+      netIncomeInWords: str({ required: true, maxLength: 1_000 }),
+    },
+    { required: true },
+  ),
+});
+
+// ---------------------------------------------------------------------------
 // Evaluation
 // ---------------------------------------------------------------------------
 
@@ -220,11 +252,12 @@ export const evaluationReportSchema: ObjectSpec = obj({
   globalRemark: str({ nullable: true, maxLength: LONG_TEXT }),
 });
 
-export type ReportType = 'evaluation' | 'incident' | 'invoice' | 'receipt';
+export type ReportType = 'evaluation' | 'incident' | 'invoice' | 'receipt' | 'payslip';
 
 export const REPORT_SCHEMAS: Readonly<Record<ReportType, ObjectSpec>> = {
   evaluation: evaluationReportSchema,
   incident: incidentReportSchema,
   invoice: invoiceReportSchema,
   receipt: receiptReportSchema,
+  payslip: paySlipReportSchema,
 };

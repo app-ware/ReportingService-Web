@@ -10,6 +10,7 @@ import { EvaluationReportsModule } from './modules/evaluation-report/evaluation-
 import { IncidentReportsModule } from './modules/incident-report/incident-reports.module';
 import { InvoiceReportsModule } from './modules/invoice-report/invoice-reports.module';
 import { ReceiptReportsModule } from './modules/receipt-report/receipt-reports.module';
+import { PaySlipReportsModule } from './modules/payslip-report/payslip-reports.module';
 
 /**
  * This service renders assembled report payloads into PDFs. It holds no database
@@ -29,6 +30,7 @@ import { ReceiptReportsModule } from './modules/receipt-report/receipt-reports.m
     IncidentReportsModule,
     InvoiceReportsModule,
     ReceiptReportsModule,
+    PaySlipReportsModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },

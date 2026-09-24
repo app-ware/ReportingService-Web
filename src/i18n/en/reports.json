@@ -67,5 +67,22 @@
     "paymentBy": "Payment by:",
     "parentSignature": "Parent Signature",
     "accountantSignature": "Accountant Signature"
+  },
+  "payslip": {
+    "documentTitle": "Pay Slip",
+    "footerTitle": "Pay Slip",
+    "heading": "Pay Slip",
+    "employeeName": "Employee Name:",
+    "employeeTitle": "Job Title:",
+    "month": "Month:",
+    "receiveDate": "Payment Date:",
+    "earnings": "Earnings",
+    "basicSalary": "Basic Salary",
+    "totalEarnings": "Total Earnings:",
+    "deductions": "Deductions",
+    "totalDeductions": "Total Deductions:",
+    "netIncome": "Net Income:",
+    "employeeSignature": "Employee Signature",
+    "accountantSignature": "Accountant Signature"
   }
 }

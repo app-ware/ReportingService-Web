@@ -4,7 +4,7 @@ import { ReportLocalizationService } from './report-localization.service';
 import { SUPPORTED_LOCALES, directionFor, isSupportedLocale, resolveMeta } from 'src/common/report-contract/report-meta';
 import { ReportType } from 'src/common/report-contract/report-schemas';
 
-const REPORT_TYPES: ReportType[] = ['evaluation', 'incident', 'invoice', 'receipt'];
+const REPORT_TYPES: ReportType[] = ['evaluation', 'incident', 'invoice', 'receipt', 'payslip'];
 
 describe('ReportLocalizationService', () => {
   let moduleRef: TestingModule;
