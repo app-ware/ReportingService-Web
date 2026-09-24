@@ -67,5 +67,22 @@
     "paymentBy": "طريقة الدفع:",
     "parentSignature": "توقيع ولي الأمر",
     "accountantSignature": "توقيع المحاسب"
+  },
+  "payslip": {
+    "documentTitle": "قسيمة الراتب",
+    "footerTitle": "قسيمة الراتب",
+    "heading": "قسيمة الراتب",
+    "employeeName": "اسم الموظف:",
+    "employeeTitle": "المسمى الوظيفي:",
+    "month": "الشهر:",
+    "receiveDate": "تاريخ الصرف:",
+    "earnings": "المستحقات",
+    "basicSalary": "الراتب الأساسي",
+    "totalEarnings": "إجمالي المستحقات:",
+    "deductions": "الخصومات",
+    "totalDeductions": "إجمالي الخصومات:",
+    "netIncome": "صافي الراتب:",
+    "employeeSignature": "توقيع الموظف",
+    "accountantSignature": "توقيع المحاسب"
   }
 }

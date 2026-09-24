@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" dir="{{dir}}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{labels.report.documentTitle}} - {{paySlip.employeeName}}</title>
+    <style>
+        {{{fontFaceCss}}}
+
+        body {
+            font-family: {{fontStack}};
+            font-size: 10pt;
+        }
+
+        .first-page-header-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0 25px;
+            box-sizing: border-box;
+        }
+
+        .first-page-header-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .header-spacer {
+            height: 90px;
+        }
+
+        .center-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .center-header img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .center-header .center-info h2 {
+            margin: 0 0 4px;
+        }
+
+        .center-header .center-info p {
+            margin: 2px 0;
+            font-size: 10pt;
+        }
+
+        .heading {
+            text-align: center;
+            margin: 10px 0 16px;
+        }
+
+        .payslip-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .trailing {
+            text-align: end;
+        }
+
+        table.pay-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            page-break-inside: auto;
+        }
+
+        table.pay-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        table.pay-table th,
+        table.pay-table td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            text-align: start;
+            word-wrap: break-word;
+        }
+
+        /* See invoice-report.hbs: an amount keeps LTR ordering so bidi cannot rearrange it. */
+        table.pay-table td.amount {
+            direction: ltr;
+            text-align: end;
+            white-space: nowrap;
+        }
+
+        table.pay-table td.label-cell {
+            text-align: end;
+        }
+
+        table.pay-table tr.section-row td {
+            background: #f2f2f2;
+            font-weight: bold;
+        }
+
+        table.pay-table tr.total-row td {
+            border-top: 2px solid #333;
+        }
+
+        .amount-words {
+            margin-top: 20px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding: 0 20px;
+        }
+
+        .signatures span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    {{#if settings.useImages}}
+    {{#if settings.headerImageBase64}}
+    <div class="first-page-header-container">
+        <img src="{{settings.headerImageBase64}}" alt="" />
+    </div>
+
+    <div class="header-spacer"></div>
+    {{/if}}
+    {{/if}}
+
+    <div class="center-header">
+        {{#if center.logoBase64}}
+        {{! See incident-report.hbs — static onerror, the second branding safety net. }}
+        <img src="{{center.logoBase64}}" alt="" onerror="this.style.display='none';" />
+        {{/if}}
+        <div class="center-info">
+            <h2>{{center.name}}</h2>
+            {{#if center.address}}
+            <p>{{center.address}}</p>
+            {{/if}}
+            {{#if center.landLine}}
+            <p>{{labels.common.phone}}: {{center.landLine}}</p>
+            {{/if}}
+        </div>
+    </div>
+
+    <h3 class="heading">{{labels.report.heading}}</h3>
+
+    <div class="payslip-meta">
+        <div>
+            <div><strong>{{labels.report.employeeName}}</strong> {{paySlip.employeeName}}</div>
+            {{#if paySlip.employeeTitle}}
+            <div><strong>{{labels.report.employeeTitle}}</strong> {{paySlip.employeeTitle}}</div>
+            {{/if}}
+        </div>
+        <div class="trailing">
+            <div><strong>{{labels.report.month}}</strong> {{paySlip.incomeMonth}}</div>
+            <div><strong>{{labels.report.receiveDate}}</strong> {{paySlip.receiveDate}}</div>
+        </div>
+    </div>
+
+    <table class="pay-table">
+        <thead>
+            <tr>
+                <th>{{labels.common.description}}</th>
+                <th>{{labels.common.amount}}</th>
+                <th>{{labels.common.currency}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="section-row">
+                <td colspan="3">{{labels.report.earnings}}</td>
+            </tr>
+            <tr>
+                <td>{{labels.report.basicSalary}}</td>
+                <td class="amount">{{paySlip.salary}}</td>
+                <td>{{paySlip.currencyCode}}</td>
+            </tr>
+            {{#each paySlip.benefits}}
+            <tr>
+                <td>{{this.title}}</td>
+                <td class="amount">{{this.amount}}</td>
+                <td>{{../paySlip.currencyCode}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+                <td class="label-cell"><strong>{{labels.report.totalEarnings}}</strong></td>
+                <td class="amount"><strong>{{paySlip.totalEarnings}}</strong></td>
+                <td>{{paySlip.currencyCode}}</td>
+            </tr>
+
+            {{#if paySlip.deductions.length}}
+            <tr class="section-row">
+                <td colspan="3">{{labels.report.deductions}}</td>
+            </tr>
+            {{#each paySlip.deductions}}
+            <tr>
+                <td>{{this.title}}</td>
+                <td class="amount">{{this.amount}}</td>
+                <td>{{../paySlip.currencyCode}}</td>
+            </tr>
+            {{/each}}
+            <tr>
+                <td class="label-cell"><strong>{{labels.report.totalDeductions}}</strong></td>
+                <td class="amount"><strong>{{paySlip.totalDeductions}}</strong></td>
+                <td>{{paySlip.currencyCode}}</td>
+            </tr>
+            {{/if}}
+
+            <tr class="total-row">
+                <td class="label-cell"><strong>{{labels.report.netIncome}}</strong></td>
+                <td class="amount"><strong>{{paySlip.netIncome}}</strong></td>
+                <td>{{paySlip.currencyCode}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="amount-words"><strong>{{paySlip.netIncomeInWords}}</strong></p>
+
+    <div class="signatures">
+        <span>{{labels.report.employeeSignature}}</span>
+        <span>{{labels.report.accountantSignature}}</span>
+    </div>
+
+</body>
+
+</html>

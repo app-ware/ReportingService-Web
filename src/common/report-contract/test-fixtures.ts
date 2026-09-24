@@ -151,6 +151,35 @@ export function receiptFixture(locale: ReportLocale = 'en', overrides: Overrides
   }, overrides);
 }
 
+export function paySlipFixture(locale: ReportLocale = 'en', overrides: Overrides = {}) {
+  const isArabic = locale === 'ar';
+
+  return merge({
+    meta: meta(locale),
+    center: isArabic ? arabicCenter : center,
+    settings: { ...bannerSettings },
+    paySlip: {
+      employeeName: isArabic ? 'أميرة سعيد' : 'Amira Said',
+      employeeTitle: isArabic ? 'معلمة' : 'Teacher',
+      incomeMonth: 'Sep 2026',
+      receiveDate: '30/09/2026',
+      currencyCode: 'EGP',
+      salary: '8,000.00',
+      benefits: [
+        { title: isArabic ? 'بدل مواصلات' : 'Transport allowance', amount: '750.00' },
+        { title: isArabic ? 'بدل سكن' : 'Housing allowance', amount: '1,250.00' },
+      ],
+      deductions: [{ title: isArabic ? 'تأمينات اجتماعية' : 'Social insurance', amount: '400.00' }],
+      totalEarnings: '10,000.00',
+      totalDeductions: '400.00',
+      netIncome: '9,600.00',
+      netIncomeInWords: isArabic
+        ? 'تسعة آلاف وستمائة جنيه مصري فقط'
+        : 'Nine Thousand Six Hundred EGP only',
+    },
+  }, overrides);
+}
+
 export function evaluationFixture(locale: ReportLocale = 'en', overrides: Overrides = {}) {
   const isArabic = locale === 'ar';
 
@@ -227,4 +256,5 @@ export const FIXTURES = {
   incident: incidentFixture,
   invoice: invoiceFixture,
   receipt: receiptFixture,
+  payslip: paySlipFixture,
 } as const;

@@ -2,6 +2,7 @@ import { BadRequestException, PayloadTooLargeException } from '@nestjs/common';
 import { ReportPayloadValidator } from './report-payload.validator';
 import { ReportRuntimeConfig, buildReportRuntimeConfig } from 'src/config/report.config';
 import { IncidentReportTemplateData } from 'src/modules/incident-report/dto/template-data.interface';
+import { paySlipFixture } from './test-fixtures';
 
 const PNG =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==';
@@ -350,6 +351,30 @@ describe('ReportPayloadValidator', () => {
 
       expect(result.data.variants).not.toHaveProperty('injected_style');
       expect(result.data.variants.title_background_color).toBe('#123456');
+    });
+  });
+
+  describe('the pay slip', () => {
+    it('accepts a pay slip with no benefits or deductions', () => {
+      const payload = paySlipFixture('en', { paySlip: { benefits: [], deductions: [], employeeTitle: null } });
+
+      const result = validator.validate<Record<string, any>>('payslip', payload);
+
+      expect(result.data.paySlip.benefits).toEqual([]);
+      expect(result.data.paySlip.netIncome).toBe('9,600.00');
+    });
+
+    it('rejects a pay slip without its net income', () => {
+      const payload = paySlipFixture('en') as Record<string, any>;
+      delete payload.paySlip.netIncome;
+
+      expect(() => validator.validate('payslip', payload)).toThrow(BadRequestException);
+    });
+
+    it('rejects a numeric amount — Nursery sends amounts pre-formatted', () => {
+      const payload = paySlipFixture('en', { paySlip: { salary: 8000 } });
+
+      expect(() => validator.validate('payslip', payload)).toThrow(BadRequestException);
     });
   });
 });
