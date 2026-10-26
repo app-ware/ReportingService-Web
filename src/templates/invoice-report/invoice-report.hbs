@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" dir="{{dir}}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{labels.report.documentTitle}} - {{invoice.studentName}}</title>
+    <style>
+        {{{fontFaceCss}}}
+
+        body {
+            font-family: {{fontStack}};
+            font-size: 10pt;
+        }
+
+        .first-page-header-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0 25px;
+            box-sizing: border-box;
+        }
+
+        .first-page-header-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .header-spacer {
+            height: 90px;
+        }
+
+        .info-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-block .issue-date {
+            grid-column: 1 / -1;
+            text-align: end;
+        }
+
+        table.fee-table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+        }
+
+        table.fee-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        table.fee-table th,
+        table.fee-table td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            text-align: start;
+            word-wrap: break-word;
+        }
+
+        /*
+         * Amounts stay in the block's own direction and are aligned to the trailing edge,
+         * which mirrors correctly for Arabic. `direction: ltr` on the cell keeps a
+         * formatted number ("1,234.56 (10.00)") in the order Nursery produced it — an
+         * amount string must never be re-ordered by bidi resolution.
+         */
+        table.fee-table td.amount {
+            direction: ltr;
+            text-align: end;
+            white-space: nowrap;
+        }
+
+        table.fee-table td.label-cell {
+            text-align: end;
+        }
+
+        table.fee-table tr.total-row td {
+            border-top: 2px solid #333;
+        }
+
+        .amount-words {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    {{#if settings.useImages}}
+    {{#if settings.headerImageBase64}}
+    <div class="first-page-header-container">
+        <img src="{{settings.headerImageBase64}}" alt="" />
+    </div>
+
+    <div class="header-spacer"></div>
+    {{/if}}
+    {{/if}}
+
+    <div class="info-block">
+        <div><strong>{{labels.report.invoiceNumber}}</strong> {{invoice.invoiceNumber}}</div>
+        <div><strong>{{labels.report.parent}}</strong> {{invoice.parentName}}</div>
+        <div><strong>{{labels.report.academicYear}}</strong> {{invoice.academicYearTitle}}</div>
+
+        <div><strong>{{labels.report.studentId}}</strong> {{invoice.studentId}}</div>
+        <div><strong>{{labels.report.student}}</strong> {{invoice.studentName}}</div>
+        <div><strong>{{labels.report.class}}</strong> {{invoice.className}}</div>
+
+        <div class="issue-date"><strong>{{labels.report.issueDate}}</strong> {{invoice.issueDate}}</div>
+    </div>
+
+    <table class="fee-table">
+        <thead>
+            <tr>
+                <th>{{labels.report.feeDescription}}</th>
+                <th>{{labels.common.amount}}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each invoice.feeLines}}
+            <tr>
+                <td>{{this.title}}</td>
+                <td class="amount">{{this.amount}}</td>
+                <td></td>
+            </tr>
+            {{/each}}
+            {{#if invoice.discount}}
+            <tr>
+                <td class="label-cell"><strong>{{invoice.discount.description}}</strong></td>
+                <td class="amount">{{invoice.discount.amount}}</td>
+                <td></td>
+            </tr>
+            {{/if}}
+            <tr>
+                <td class="label-cell"><strong>{{labels.report.vat}}</strong></td>
+                <td class="amount">{{invoice.vatAmount}}</td>
+                <td></td>
+            </tr>
+            <tr class="total-row">
+                <td class="label-cell"><strong>{{labels.report.total}}</strong></td>
+                <td class="amount"><strong>{{invoice.total}}</strong></td>
+                <td>{{invoice.currencyCode}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="amount-words"><strong>{{invoice.totalInWords}}</strong></p>
+
+</body>
+
+</html>

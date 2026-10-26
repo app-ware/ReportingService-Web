@@ -1,0 +1,14 @@
+# Dependency directories
+node_modules
+
+# Compiled TypeScript output
+dist
+
+# Git and environment files
+.git
+.gitignore
+.env
+
+# Docker files
+Dockerfile
+.dockerignore

@@ -1,0 +1,201 @@
+name: CI/CD Pipeline - Reporting Service (ReportingService-Web)
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - main
+      - develop
+      - ci/cd
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Target Environment to deploy'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/reportingservice
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ==============================================================================
+  # 1. BUILD & PUSH: Build Docker image and push to GitHub Container Registry (GHCR)
+  # ==============================================================================
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=sha,prefix=
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ==============================================================================
+  # 2. STAGING DEPLOYMENT: https://appwarestg.com
+  # ==============================================================================
+  deploy-staging:
+    name: Deploy to Staging (appwarestg.com)
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://appwarestg.com
+    if: >-
+      github.ref == 'refs/heads/develop' ||
+      github.ref == 'refs/heads/ci/cd' ||
+      (github.event_name == 'workflow_dispatch' && (inputs.target_env == 'staging' || inputs.target_env == 'all'))
+
+    steps:
+      - name: Deploy to staging server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          port: ${{ secrets.STAGING_PORT || 22 }}
+          script: |
+            cd /opt/icare/backend
+
+            # Ensure env files exist to prevent compose stat errors
+            touch .env.reporting .env.audit
+
+            # Login to GitHub Container Registry
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+            # Set environment-specific tag for Staging
+            export REPORTING_IMAGE_TAG="develop"
+
+            # Pull staging image independently while old container still serves traffic
+            docker compose pull reporting-service
+
+            # Recreate reporting service with zero interruption to other services
+            docker compose up -d --no-deps --force-recreate reporting-service
+
+            # Verify that reporting_service_container is running
+            sleep 3
+            status=$(docker inspect --format='{{.State.Status}}' reporting_service_container 2>/dev/null || echo "unknown")
+            if [ "$status" = "running" ]; then
+              echo "✓ reporting_service_container deployed and running successfully on Staging."
+            else
+              echo "✗ Error: reporting_service_container failed to start on Staging! Current status: $status"
+              docker logs --tail 50 reporting_service_container
+              exit 1
+            fi
+
+            # Cleanup old images
+            docker image prune -f
+
+            # Show status
+            docker ps --filter name=reporting_service_container
+
+  # ==============================================================================
+  # 3. PRODUCTION DEPLOYMENT: https://icare-portal.com
+  # ==============================================================================
+  deploy-production:
+    name: Deploy to Production (icare-portal.com)
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://icare-portal.com
+    if: >-
+      github.ref == 'refs/heads/main' ||
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.target_env == 'production' || inputs.target_env == 'all'))
+
+    steps:
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_PORT || 22 }}
+          script: |
+            cd /opt/icare/backend
+
+            # Ensure env files exist to prevent compose stat errors
+            touch .env.reporting .env.audit
+
+            # Login to GitHub Container Registry
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+            # Determine reporting image tag based on trigger
+            if [ "${{ github.ref_type }}" = "tag" ]; then
+              export REPORTING_IMAGE_TAG="${{ github.ref_name }}"
+            else
+              export REPORTING_IMAGE_TAG="latest"
+            fi
+            echo "Deploying to Production with REPORTING_IMAGE_TAG=$REPORTING_IMAGE_TAG"
+
+            # Pull production image independently while old container still serves traffic
+            docker compose pull reporting-service
+
+            # Recreate reporting service with zero interruption to other services
+            docker compose up -d --no-deps --force-recreate reporting-service
+
+            # Verify that reporting_service_container is running
+            sleep 3
+            status=$(docker inspect --format='{{.State.Status}}' reporting_service_container 2>/dev/null || echo "unknown")
+            if [ "$status" = "running" ]; then
+              echo "✓ reporting_service_container deployed and running successfully on Production."
+            else
+              echo "✗ Error: reporting_service_container failed to start on Production! Current status: $status"
+              docker logs --tail 50 reporting_service_container
+              exit 1
+            fi
+
+            # Cleanup old images
+            docker image prune -f
+
+            # Show status
+            docker ps --filter name=reporting_service_container

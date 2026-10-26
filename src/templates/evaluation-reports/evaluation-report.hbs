@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" dir="{{dir}}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{labels.report.documentTitle}} - {{childInfo.name}}</title>
+    <style>
+        {{{fontFaceCss}}}
+
+        body {
+            font-family: {{fontStack}};
+            font-size: 10pt;
+        }
+
+        .first-page-header-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0 25px;
+            box-sizing: border-box;
+        }
+
+        .first-page-header-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .header-spacer {
+            height: 90px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: start;
+            word-wrap: break-word;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 8px 16px;
+            background-color: #f9f9f9;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin: 10px auto;
+            width: 90%;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .student-info p {
+            margin: 4px 0;
+        }
+
+        /* Term columns are graded values, centered in both directions. */
+        .term-value {
+            text-align: center;
+        }
+
+        .global-remark {
+            margin-top: 25px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            page-break-inside: avoid;
+        }
+
+        .global-remark h4 {
+            margin-top: 0;
+        }
+
+        .global-remark p {
+            margin-bottom: 0;
+        }
+
+        .legend-section {
+            margin-top: 25px;
+            page-break-inside: avoid;
+        }
+
+        .legend-section table {
+            margin: 0 auto;
+            width: 40%;
+            border-collapse: collapse;
+        }
+
+        .legend-section td,
+        .legend-section th {
+            text-align: center;
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+    {{#if settings.useImages}}
+    {{#if settings.headerImageBase64}}
+    <div class="first-page-header-container">
+        <img src="{{settings.headerImageBase64}}" alt="" />
+    </div>
+
+    <div class="header-spacer"></div>
+    {{/if}}
+    {{/if}}
+
+    <h1 style="text-align: center;">{{labels.report.heading}}</h1>
+    <div>
+        <hr>
+        {{!
+            Each label resolves to the center's own configured wording when it set any,
+            and to the localized default otherwise — see EvaluationReportsService.
+        }}
+        <div class="student-info">
+
+            <div>
+                <strong>{{label variants.label_student_name labels.report.studentName}}</strong>
+                <span>{{childInfo.name}}</span>
+            </div>
+
+            <div>
+                <strong>{{label variants.label_class labels.report.class}}</strong>
+                <span>{{childInfo.class}}</span>
+            </div>
+
+            {{#if settings.showAge}}
+            <div>
+                <strong>{{label variants.label_age labels.report.age}}</strong>
+                <span>{{childInfo.age}}</span>
+            </div>
+            {{/if}}
+
+            <div>
+                <span>
+                    <strong>{{label variants.label_from labels.report.from}}: </strong>{{childInfo.dateFrom}}
+                    &nbsp;|&nbsp;
+                    <strong>{{label variants.label_to labels.report.to}}: </strong>{{childInfo.dateTo}}
+                </span>
+            </div>
+
+            {{#if settings.showAttendance}}
+            <div>
+                <strong>{{label variants.label_attendance labels.report.attendance}}</strong>
+                <span>{{childInfo.attendance}}</span>
+            </div>
+            {{/if}}
+
+            {{#if settings.showTeacher}}
+            <div>
+                <strong>{{label variants.label_teacher labels.report.teacher}}</strong>
+                <span>{{childInfo.teacher}}</span>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <main>
+        <table>
+            <tbody>
+                {{#each nodes}}
+                {{> node}}
+                {{/each}}
+            </tbody>
+        </table>
+
+        {{#if globalRemark}}
+        <div class="global-remark">
+            <h4>{{label variants.label_remark_global labels.report.globalRemark}}</h4>
+            <p>{{globalRemark}}</p>
+        </div>
+        {{/if}}
+
+        {{#if legend}}
+        <div class="legend-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2">{{label variants.label_legend labels.report.legend}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each legend}}
+                    <tr>
+                        <td>{{this.value}}:</td>
+                        <td>{{this.text}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+
+        </div>
+        {{/if}}
+    </main>
+</body>
+
+</html>
