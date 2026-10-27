@@ -77,12 +77,17 @@ export class ReportFooterBuilder {
       return { footerTemplate: textFooterHtml, marginBottom: defaultMarginBottom };
     }
 
+    // The banner must fit inside the bottom margin or Chromium clips it. Its height is
+    // capped to what the margin leaves after the text row, and object-fit keeps any
+    // aspect ratio a center uploads whole instead of overflowing.
+    const bannerMaxHeight = footerBannerMaxHeight(bannerMarginBottom);
+
     return {
       footerTemplate: `
           <div dir="${dir}" style="width: 100%;">
             ${textFooterHtml}
             <div style="padding: 5px 25px 0; box-sizing: border-box;">
-              <img src="${input.footerImageBase64}" style="width: 100%; height: auto;" />
+              <img src="${input.footerImageBase64}" style="display: block; width: 100%; height: auto; max-height: ${bannerMaxHeight}px; object-fit: contain;" />
             </div>
           </div>`,
       marginBottom: bannerMarginBottom,
@@ -101,6 +106,22 @@ export class ReportFooterBuilder {
       return new Date().toISOString().slice(0, 10);
     }
   }
+}
+
+/** Room the text row (date, title, page numbers) and paddings take inside the bottom margin. */
+const FOOTER_TEXT_ALLOWANCE_PX = 40;
+const FOOTER_BANNER_FALLBACK_MAX_HEIGHT_PX = 100;
+
+/**
+ * The tallest the footer banner may be for a given bottom margin. Margins are configured
+ * in px; anything else falls back to the height that fits the default 140px margin.
+ */
+export function footerBannerMaxHeight(marginBottom: string): number {
+  const match = /^(\d+(?:\.\d+)?)px$/.exec(marginBottom.trim());
+  if (!match) {
+    return FOOTER_BANNER_FALLBACK_MAX_HEIGHT_PX;
+  }
+  return Math.max(Number(match[1]) - FOOTER_TEXT_ALLOWANCE_PX, 0);
 }
 
 /**

@@ -60,12 +60,23 @@ export class ReportTemplateService implements OnModuleInit {
   private async registerPartials(): Promise<void> {
     // The evaluation node partial recurses into itself, so it has to be registered by name.
     const nodePartial = path.join(this.templateRoot, 'evaluation-reports', 'node.hbs');
+    // Shared partials (e.g. the branding banner) are registered by file name, so every
+    // report includes the same markup and a layout fix lands in all of them at once.
+    const sharedDir = path.join(this.templateRoot, 'partials');
 
     try {
       this.handlebars.registerPartial('node', await fs.readFile(nodePartial, 'utf-8'));
+
+      for (const file of await fs.readdir(sharedDir)) {
+        if (file.endsWith('.hbs')) {
+          const source = await fs.readFile(path.join(sharedDir, file), 'utf-8');
+          this.handlebars.registerPartial(path.basename(file, '.hbs'), source);
+        }
+      }
+
       this.logger.debug('Report template partials registered.');
     } catch (error) {
-      this.logger.error({ err: error, path: nodePartial }, 'Failed to register report template partial.');
+      this.logger.error({ err: error }, 'Failed to register report template partials.');
       throw error;
     }
   }

@@ -1,3 +1,4 @@
+import { deflateSync } from 'zlib';
 import { GatewayTimeoutException, ServiceUnavailableException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppLoggerModule } from 'src/common/logger/logger.module';
@@ -45,6 +46,56 @@ function decodeEntities(markup: string): string {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
+}
+
+const TEMPLATE_PATHS: Record<ReportType, string> = {
+  evaluation: 'evaluation-reports/evaluation-report.hbs',
+  incident: 'incident-report/incident-report.hbs',
+  invoice: 'invoice-report/invoice-report.hbs',
+  receipt: 'receipt-report/receipt-report.hbs',
+  payslip: 'payslip-report/payslip-report.hbs',
+};
+
+/** CRC-32 as PNG chunks require it. */
+function crc32(bytes: Buffer): number {
+  let crc = ~0;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) {
+      crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+    }
+  }
+  return ~crc >>> 0;
+}
+
+/** A solid-colour RGB PNG data URI of the given size, for banners of any aspect ratio. */
+function solidPng(width: number, height: number): string {
+  const chunk = (type: string, data: Buffer): Buffer => {
+    const typed = Buffer.concat([Buffer.from(type, 'latin1'), data]);
+    const length = Buffer.alloc(4);
+    length.writeUInt32BE(data.length);
+    const crc = Buffer.alloc(4);
+    crc.writeUInt32BE(crc32(typed));
+    return Buffer.concat([length, typed, crc]);
+  };
+
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
+  header[8] = 8; // bit depth
+  header[9] = 2; // colour type: RGB
+
+  // Each scanline is a filter byte (0) followed by width RGB pixels.
+  const row = Buffer.concat([Buffer.from([0]), Buffer.alloc(width * 3, 0x4a)]);
+  const pixels = deflateSync(Buffer.concat(Array.from({ length: height }, () => row)));
+
+  const png = Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk('IHDR', header),
+    chunk('IDAT', pixels),
+    chunk('IEND', Buffer.alloc(0)),
+  ]);
+  return `data:image/png;base64,${png.toString('base64')}`;
 }
 
 /** A logger stub — `PinoLogger` is transient-scoped and cannot be pulled from `get()`. */
@@ -134,6 +185,72 @@ describe('Report rendering (integration, real Chromium)', () => {
       expect(isPdf(a5)).toBe(true);
       // Same content, different media box — the two documents cannot be byte-identical.
       expect(a4.equals(a5)).toBe(false);
+    });
+  });
+
+  /**
+   * Each center uploads its own header banner, so the layout has to hold for any aspect
+   * ratio. The rendered HTML is laid out in Chromium at A4 content width and the banner
+   * is measured: capped in height, and never overlapping the content that follows it.
+   */
+  describe('branding banner layout', () => {
+    const A4_CONTENT_WIDTH_PX = 794 - 50;
+    const BANNER_MAX_HEIGHT_PX = 110;
+
+    const banners: [string, string][] = [
+      ['wide (10:1)', solidPng(1600, 160)],
+      ['square', solidPng(400, 400)],
+      ['tall (1:4)', solidPng(200, 800)],
+      ['1x1', TINY_PNG],
+    ];
+
+    const cases = reportTypes.flatMap((reportType) =>
+      banners.map(([label, image]) => [reportType, label, image] as [ReportType, string, string]),
+    );
+
+    it.each(cases)('%s keeps a %s banner capped and clear of the content', async (reportType, _label, image) => {
+      const fixture = FIXTURES[reportType]('en') as { settings: Record<string, unknown> };
+      const payload = { ...fixture, settings: { ...fixture.settings, useImages: true, headerImageBase64: image } };
+      const validated = validator.validate(reportType, payload);
+      const context = localization.contextFor(reportType, validated.locale);
+
+      const markup = await templates.render(TEMPLATE_PATHS[reportType], {
+        ...(validated.data as object),
+        lang: context.locale,
+        dir: context.dir,
+        isRtl: context.isRtl,
+        labels: context.labels,
+        fontFaceCss: fonts.fontFaceCss(),
+        fontStack: fonts.fontStack(),
+      });
+
+      const browserContext = await browsers.newContext();
+      try {
+        const page = await browserContext.newPage();
+        await page.setViewportSize({ width: A4_CONTENT_WIDTH_PX, height: 1123 });
+        await page.setContent(markup, { waitUntil: 'load' });
+
+        const box = await page.evaluate(() => {
+          const banner = document.querySelector('.report-banner');
+          const img = banner?.querySelector('img');
+          const next = banner?.nextElementSibling;
+          if (!banner || !img || !next) {
+            return null;
+          }
+          return {
+            imgHeight: img.getBoundingClientRect().height,
+            bannerBottom: banner.getBoundingClientRect().bottom,
+            nextTop: next.getBoundingClientRect().top,
+          };
+        });
+
+        expect(box).not.toBeNull();
+        expect(box!.imgHeight).toBeGreaterThan(0);
+        expect(box!.imgHeight).toBeLessThanOrEqual(BANNER_MAX_HEIGHT_PX + 0.5);
+        expect(box!.nextTop).toBeGreaterThanOrEqual(box!.bannerBottom);
+      } finally {
+        await browserContext.close();
+      }
     });
   });
 

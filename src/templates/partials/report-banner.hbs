@@ -1,0 +1,8 @@
+{{#if settings.useImages}}
+{{#if settings.headerImageBase64}}
+<div class="report-banner">
+    {{! Same static onerror safety net as the center logo. }}
+    <img src="{{settings.headerImageBase64}}" alt="" onerror="this.style.display='none';" />
+</div>
+{{/if}}
+{{/if}}
