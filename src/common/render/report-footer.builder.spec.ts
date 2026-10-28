@@ -1,5 +1,5 @@
 import { PinoLogger } from 'nestjs-pino';
-import { ReportFooterBuilder, escapeHtml } from './report-footer.builder';
+import { ReportFooterBuilder, escapeHtml, footerBannerMaxHeight } from './report-footer.builder';
 import { LocalizedReportContext } from './report-localization.service';
 import { buildReportRuntimeConfig } from 'src/config/report.config';
 
@@ -75,6 +75,27 @@ describe('ReportFooterBuilder', () => {
 
     expect(footerTemplate).toContain(`src="${PNG}"`);
     expect(marginBottom).toBe('140px');
+  });
+
+  it('caps the footer banner to the bottom margin so any aspect ratio fits unclipped', () => {
+    const { footerTemplate } = builder.build({
+      localization: context('en'),
+      title: 'Receipt',
+      includeFooter: true,
+      footerImageBase64: PNG,
+      bannerMarginBottom: '160px',
+    });
+
+    expect(footerTemplate).toContain('max-height: 120px;');
+    expect(footerTemplate).toContain('object-fit: contain;');
+  });
+
+  it.each([
+    ['140px', 100],
+    ['20px', 0],
+    ['3cm', 100],
+  ])('derives the footer banner height from a %s margin', (margin, expected) => {
+    expect(footerBannerMaxHeight(margin)).toBe(expected);
   });
 
   it('honours per-report margin overrides', () => {
