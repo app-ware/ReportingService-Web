@@ -12,24 +12,7 @@
             font-size: 10pt;
         }
 
-        .first-page-header-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 0 25px;
-            box-sizing: border-box;
-        }
-
-        .first-page-header-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .header-spacer {
-            height: 90px;
-        }
+{{> report-banner-styles}}
 
         .info-block {
             display: grid;
@@ -90,15 +73,7 @@
 
 <body>
 
-    {{#if settings.useImages}}
-    {{#if settings.headerImageBase64}}
-    <div class="first-page-header-container">
-        <img src="{{settings.headerImageBase64}}" alt="" />
-    </div>
-
-    <div class="header-spacer"></div>
-    {{/if}}
-    {{/if}}
+    {{> report-banner}}
 
     <div class="info-block">
         <div><strong>{{labels.report.invoiceNumber}}</strong> {{invoice.invoiceNumber}}</div>

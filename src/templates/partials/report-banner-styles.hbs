@@ -1,0 +1,22 @@
+        /*
+         * First-page header banner. Each center uploads its own image, so nothing here
+         * may assume a size or aspect ratio: the banner stays in normal flow (content is
+         * always pushed below it, never overlapped) and is capped in height, with
+         * object-fit keeping a tall or square image whole and centered inside the cap.
+         */
+        .report-banner {
+            margin: 0 0 16px;
+            break-inside: avoid;
+        }
+
+        .report-banner img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 110px;
+            object-fit: contain;
+        }
+
+        body.compact .report-banner img {
+            max-height: 70px;
+        }
