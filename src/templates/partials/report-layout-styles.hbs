@@ -1,0 +1,53 @@
+        /*
+         * First-page header banner. Each center uploads its own image, so nothing here
+         * may assume a size or aspect ratio: the banner stays in normal flow (content is
+         * always pushed below it, never overlapped) and is capped in height, with
+         * object-fit keeping a tall or square image whole and centered inside the cap.
+         */
+        .report-banner {
+            margin: 0 0 16px;
+            break-inside: avoid;
+        }
+
+        .report-banner img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 110px;
+            object-fit: contain;
+        }
+
+        body.compact .report-banner img {
+            max-height: 70px;
+        }
+
+        /*
+         * A short report fills its page: the spacer takes the leftover height, so the
+         * signatures and the footer banner sit at the bottom of the page instead of
+         * leaving the white space under them. `pageFillHeight` is the printable height
+         * computed by the render pipeline, minus the body's default 8px margins. A longer
+         * report simply grows past it and the closing blocks follow the content.
+         */
+        .page-fill {
+            display: flex;
+            flex-direction: column;
+            min-height: calc({{pageFillHeight}} - 16px);
+        }
+
+        .page-fill-spacer {
+            flex: 1 0 auto;
+        }
+
+        /* Footer banner, printed once at the end of the document — not on every page. */
+        .report-footer-banner {
+            margin-top: 16px;
+            break-inside: avoid;
+        }
+
+        .report-footer-banner img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 100px;
+            object-fit: contain;
+        }

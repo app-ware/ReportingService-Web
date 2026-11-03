@@ -56,6 +56,20 @@ const TEMPLATE_PATHS: Record<ReportType, string> = {
   payslip: 'payslip-report/payslip-report.hbs',
 };
 
+/** Page objects in the PDF. Chromium writes them uncompressed, so a scan is enough. */
+function pageCount(buffer: Buffer): number {
+  return (buffer.toString('latin1').match(/\/Type\s*\/Page(?![s\w])/g) ?? []).length;
+}
+
+/** Width and height of the first page's media box, in PDF points. */
+function mediaBox(buffer: Buffer): [number, number] {
+  const match = /\/MediaBox\s*\[\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\]/.exec(buffer.toString('latin1'));
+  if (!match) {
+    throw new Error('No MediaBox found in the PDF.');
+  }
+  return [Number(match[3]) - Number(match[1]), Number(match[4]) - Number(match[2])];
+}
+
 /** CRC-32 as PNG chunks require it. */
 function crc32(bytes: Buffer): number {
   let crc = ~0;
@@ -185,6 +199,49 @@ describe('Report rendering (integration, real Chromium)', () => {
       expect(isPdf(a5)).toBe(true);
       // Same content, different media box — the two documents cannot be byte-identical.
       expect(a4.equals(a5)).toBe(false);
+    });
+
+    it('prints A5 landscape, as the legacy half-sheet receipt was', async () => {
+      const a5 = await services.receipt.createPdfFromData(
+        receiptFixture('en', { settings: { ...receiptFixture('en').settings, reportSize: 'A5' } }),
+      );
+
+      const [width, height] = mediaBox(a5);
+      expect(width).toBeGreaterThan(height);
+    });
+  });
+
+  /**
+   * Short reports stretch to fill their page so the signatures and footer banner sit at
+   * the bottom. The stretch is sized to the printable height; if it were even slightly
+   * too tall, every short report would gain an empty second page.
+   */
+  describe('page fill', () => {
+    const wideBanner = solidPng(1600, 230);
+    const withBranding = (payload: { settings: Record<string, unknown> }, extra: Record<string, unknown> = {}) => ({
+      ...payload,
+      settings: {
+        ...payload.settings,
+        useImages: true,
+        includeFooter: true,
+        headerImageBase64: wideBanner,
+        footerImageBase64: wideBanner,
+        ...extra,
+      },
+    });
+
+    it.each([
+      ['incident', () => withBranding(incidentFixture('en'))],
+      ['invoice', () => withBranding(FIXTURES.invoice('en') as { settings: Record<string, unknown> })],
+      ['payslip', () => withBranding(paySlipFixture('en'))],
+      ['receipt A4', () => withBranding(receiptFixture('en'))],
+      ['receipt A5', () => withBranding(receiptFixture('en'), { reportSize: 'A5' })],
+      ['receipt A4 without images', () => receiptFixture('en')],
+    ] as [string, () => unknown][])('keeps a short %s on exactly one page', async (label, payload) => {
+      const reportType = label.split(' ')[0] as ReportType;
+      const buffer = await services[reportType].createPdfFromData(payload());
+
+      expect(pageCount(buffer)).toBe(1);
     });
   });
 

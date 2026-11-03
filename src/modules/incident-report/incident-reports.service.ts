@@ -25,12 +25,10 @@ export class IncidentReportsService {
       templatePath: 'incident-report/incident-report.hbs',
       validated,
       correlationId,
-      layout: (context, data) => ({
+      layout: (context) => ({
         format: 'A4',
         margin: { top: '25px', right: '25px', left: '25px' },
         footerTitle: context.labels.report.documentTitle ?? 'Incident Report',
-        includeFooter: data.settings?.includeFooter,
-        footerImageBase64: data.settings?.footerImageBase64,
       }),
     });
   }

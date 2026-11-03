@@ -1,0 +1,8 @@
+{{#if settings.includeFooter}}
+{{#if settings.footerImageBase64}}
+<div class="report-footer-banner">
+    {{! Same static onerror safety net as the center logo. }}
+    <img src="{{settings.footerImageBase64}}" alt="" onerror="this.style.display='none';" />
+</div>
+{{/if}}
+{{/if}}

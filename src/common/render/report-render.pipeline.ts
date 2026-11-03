@@ -9,14 +9,30 @@ import { ReportType } from 'src/common/report-contract/report-schemas';
 
 export interface ReportLayout {
   format: 'A4' | 'A5';
-  /** Bottom is supplied by the footer builder, since the banner decides it. */
+  landscape?: boolean;
+  /** Bottom is the footer's margin, supplied separately. */
   margin: { top: string; right: string; left: string };
   /** Text shown centered in the page footer. */
   footerTitle: string;
-  includeFooter?: boolean;
-  footerImageBase64?: string | null;
-  defaultMarginBottom?: string;
-  bannerMarginBottom?: string;
+  /** Bottom margin the text footer is drawn in; defaults to 40px. */
+  marginBottom?: string;
+}
+
+/** Page heights in mm, portrait. Landscape swaps to the page width. */
+const PAGE_SIZE_MM: Record<ReportLayout['format'], { width: number; height: number }> = {
+  A4: { width: 210, height: 297 },
+  A5: { width: 148, height: 210 },
+};
+
+/**
+ * The printable height of one page as a CSS length, so a template can make a short
+ * report fill its page (see `.page-fill` in the shared layout styles). A few px are
+ * held back so rounding never spills the closing blocks onto an empty second page.
+ */
+export function pageFillHeight(layout: ReportLayout, marginBottom: string): string {
+  const size = PAGE_SIZE_MM[layout.format];
+  const pageHeight = layout.landscape ? size.width : size.height;
+  return `calc(${pageHeight}mm - ${layout.margin.top} - ${marginBottom} - 4px)`;
 }
 
 export interface PipelineInput<T> {
@@ -54,10 +70,7 @@ export class ReportRenderPipeline {
     const footer = this.footers.build({
       localization: context,
       title: layout.footerTitle,
-      includeFooter: layout.includeFooter,
-      footerImageBase64: layout.footerImageBase64,
-      defaultMarginBottom: layout.defaultMarginBottom,
-      bannerMarginBottom: layout.bannerMarginBottom,
+      marginBottom: layout.marginBottom,
     });
 
     const html = await this.templates.render(input.templatePath, {
@@ -71,6 +84,7 @@ export class ReportRenderPipeline {
       labels: context.labels,
       fontFaceCss: this.fonts.fontFaceCss(),
       fontStack: this.fonts.fontStack(),
+      pageFillHeight: pageFillHeight(layout, footer.marginBottom),
     });
 
     return this.renderer.render({
@@ -84,6 +98,7 @@ export class ReportRenderPipeline {
       html,
       pdf: {
         format: layout.format,
+        landscape: layout.landscape ?? false,
         margin: { ...layout.margin, bottom: footer.marginBottom },
         footerTemplate: footer.footerTemplate,
       },

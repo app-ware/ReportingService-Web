@@ -14,6 +14,7 @@ import { ReportType } from 'src/common/report-contract/report-schemas';
 
 export interface PdfPageOptions {
   format: 'A4' | 'A5';
+  landscape?: boolean;
   margin: { top: string; right: string; bottom: string; left: string };
   footerTemplate: string;
 }
@@ -116,6 +117,7 @@ export class PdfRendererService {
 
       const buffer = await page.pdf({
         format: request.pdf.format,
+        landscape: request.pdf.landscape ?? false,
         printBackground: true,
         margin: request.pdf.margin,
         displayHeaderFooter: true,
