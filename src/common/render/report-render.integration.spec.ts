@@ -20,7 +20,8 @@ import { IncidentReportsService } from 'src/modules/incident-report/incident-rep
 import { InvoiceReportsService } from 'src/modules/invoice-report/invoice-reports.service';
 import { ReceiptReportsService } from 'src/modules/receipt-report/receipt-reports.service';
 import { PaySlipReportsService } from 'src/modules/payslip-report/payslip-reports.service';
-import { FIXTURES, TINY_PNG, incidentFixture, paySlipFixture, receiptFixture } from 'src/common/report-contract/test-fixtures';
+import { InstallmentReportsService } from 'src/modules/installment-report/installment-reports.service';
+import { FIXTURES, TINY_PNG, incidentFixture, installmentFixture, paySlipFixture, receiptFixture } from 'src/common/report-contract/test-fixtures';
 
 /** Real Chromium renders take seconds, and this file does many of them. */
 jest.setTimeout(180_000);
@@ -54,6 +55,7 @@ const TEMPLATE_PATHS: Record<ReportType, string> = {
   invoice: 'invoice-report/invoice-report.hbs',
   receipt: 'receipt-report/receipt-report.hbs',
   payslip: 'payslip-report/payslip-report.hbs',
+  installment: 'installment-report/installment-report.hbs',
 };
 
 /** Page objects in the PDF. Chromium writes them uncompressed, so a scan is enough. */
@@ -138,6 +140,7 @@ describe('Report rendering (integration, real Chromium)', () => {
         InvoiceReportsService,
         ReceiptReportsService,
         PaySlipReportsService,
+        InstallmentReportsService,
       ],
     }).compile();
 
@@ -157,6 +160,7 @@ describe('Report rendering (integration, real Chromium)', () => {
       invoice: moduleRef.get(InvoiceReportsService),
       receipt: moduleRef.get(ReceiptReportsService),
       payslip: moduleRef.get(PaySlipReportsService),
+      installment: moduleRef.get(InstallmentReportsService),
     };
   });
 
@@ -164,7 +168,7 @@ describe('Report rendering (integration, real Chromium)', () => {
     await moduleRef?.close();
   });
 
-  const reportTypes: ReportType[] = ['evaluation', 'incident', 'invoice', 'receipt', 'payslip'];
+  const reportTypes: ReportType[] = ['evaluation', 'incident', 'invoice', 'receipt', 'payslip', 'installment'];
 
   describe('every report renders a valid PDF in every locale', () => {
     const cases = reportTypes.flatMap((reportType) =>
@@ -211,6 +215,43 @@ describe('Report rendering (integration, real Chromium)', () => {
     });
   });
 
+  describe('installment slip', () => {
+    it('prints A5 landscape, as the legacy slip was', async () => {
+      const buffer = await services.installment.createPdfFromData(installmentFixture('en'));
+
+      const [width, height] = mediaBox(buffer);
+      expect(width).toBeGreaterThan(height);
+      // A5 landscape is about 595 x 420 pt (Chromium rounds to whole pixels).
+      expect(Math.abs(width - 595)).toBeLessThan(3);
+      expect(Math.abs(height - 420)).toBeLessThan(3);
+    });
+
+    it('turns the text footer off and keeps the footer margin small', async () => {
+      const spy = jest.spyOn(renderer, 'render');
+      try {
+        await services.installment.createPdfFromData(installmentFixture('en'));
+
+        const request = spy.mock.calls[spy.mock.calls.length - 1][0];
+        expect(request.pdf.footerTemplate).toBeNull();
+        expect(request.pdf.margin.bottom).toBe('15px');
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
+    it('keeps the text footer on for the other reports', async () => {
+      const spy = jest.spyOn(renderer, 'render');
+      try {
+        await services.invoice.createPdfFromData(FIXTURES.invoice('en'));
+
+        const request = spy.mock.calls[spy.mock.calls.length - 1][0];
+        expect(request.pdf.footerTemplate).toContain('class="pageNumber"');
+      } finally {
+        spy.mockRestore();
+      }
+    });
+  });
+
   /**
    * Short reports stretch to fill their page so the signatures and footer banner sit at
    * the bottom. The stretch is sized to the printable height; if it were even slightly
@@ -237,6 +278,7 @@ describe('Report rendering (integration, real Chromium)', () => {
       ['receipt A4', () => withBranding(receiptFixture('en'))],
       ['receipt A5', () => withBranding(receiptFixture('en'), { reportSize: 'A5' })],
       ['receipt A4 without images', () => receiptFixture('en')],
+      ['installment', () => withBranding(installmentFixture('en'))],
     ] as [string, () => unknown][])('keeps a short %s on exactly one page', async (label, payload) => {
       const reportType = label.split(' ')[0] as ReportType;
       const buffer = await services[reportType].createPdfFromData(payload());
@@ -322,13 +364,7 @@ describe('Report rendering (integration, real Chromium)', () => {
       const validated = validator.validate(reportType, payload ?? FIXTURES[reportType](locale));
       const context = localization.contextFor(reportType, validated.locale);
 
-      const templatePath = {
-        evaluation: 'evaluation-reports/evaluation-report.hbs',
-        incident: 'incident-report/incident-report.hbs',
-        invoice: 'invoice-report/invoice-report.hbs',
-        receipt: 'receipt-report/receipt-report.hbs',
-        payslip: 'payslip-report/payslip-report.hbs',
-      }[reportType];
+      const templatePath = TEMPLATE_PATHS[reportType];
 
       return templates.render(templatePath, {
         ...(validated.data as object),
@@ -415,6 +451,26 @@ describe('Report rendering (integration, real Chromium)', () => {
 
       expect(noDeductions).not.toContain('Total Deductions:');
       expect(noDeductions).toContain('Net Income:');
+    });
+
+    it.each([
+      ['en', 'pending', 'Pending'],
+      ['en', 'paid', 'Paid'],
+      ['en', 'cancelled', 'Cancelled'],
+      ['fr', 'paid', 'Payé'],
+      ['ar', 'cancelled', 'ملغى'],
+    ] as [ReportLocale, string, string][])('prints the %s installment status %s as "%s"', async (locale, status, label) => {
+      const markup = decodeEntities(await html('installment', locale, installmentFixture(locale, { installment: { status } })));
+
+      expect(markup).toContain(label);
+    });
+
+    it('prints the installment position and keeps the amount as supplied', async () => {
+      const markup = await html('installment', 'ar');
+
+      expect(markup).toContain('1 / 10');
+      expect(markup).toContain('2,532.00');
+      expect(markup).toContain('USD');
     });
 
     it('mixes Arabic content with Latin values without altering either', async () => {

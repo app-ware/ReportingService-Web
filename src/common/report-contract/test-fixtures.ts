@@ -251,10 +251,38 @@ export function evaluationFixture(locale: ReportLocale = 'en', overrides: Overri
   }, overrides);
 }
 
+export function installmentFixture(locale: ReportLocale = 'en', overrides: Overrides = {}) {
+  const isArabic = locale === 'ar';
+
+  return merge({
+    meta: meta(locale),
+    settings: { ...bannerSettings },
+    installment: {
+      parentName: isArabic ? 'حسن محمد علي' : 'Hassan Mohamed Ali',
+      spouseName: null,
+      studentName: isArabic ? 'يارا حسن محمد' : 'Yara Hassan Mohamed',
+      studentId: 22730,
+      className: 'KG1-A',
+      academicYearTitle: '2026-2027',
+      dueDate: '15/06/2026',
+      issueDate: '27/08/2025',
+      amount: '2,532.00',
+      currencyCode: 'USD',
+      amountInWords: isArabic
+        ? 'ألفان وخمسمائة واثنان وثلاثون دولارًا فقط'
+        : 'Two thousand five hundred thirty-two USD only',
+      status: 'pending' as const,
+      number: 1,
+      count: 10,
+    },
+  }, overrides);
+}
+
 export const FIXTURES = {
   evaluation: evaluationFixture,
   incident: incidentFixture,
   invoice: invoiceFixture,
   receipt: receiptFixture,
   payslip: paySlipFixture,
+  installment: installmentFixture,
 } as const;

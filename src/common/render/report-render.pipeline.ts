@@ -16,6 +16,12 @@ export interface ReportLayout {
   footerTitle: string;
   /** Bottom margin the text footer is drawn in; defaults to 40px. */
   marginBottom?: string;
+  /**
+   * Whether Chromium draws the text footer (render date, title, page n of N) on every
+   * page. Defaults to true. A report whose legacy print had no such footer (the
+   * installment slip) turns it off; `marginBottom` is then just the page's bottom margin.
+   */
+  textFooter?: boolean;
 }
 
 /** Page heights in mm, portrait. Landscape swaps to the page width. */
@@ -67,11 +73,14 @@ export class ReportRenderPipeline {
     const context = this.localization.contextFor(input.reportType, validated.locale);
     const layout = input.layout(context, validated.data);
 
-    const footer = this.footers.build({
-      localization: context,
-      title: layout.footerTitle,
-      marginBottom: layout.marginBottom,
-    });
+    const footer =
+      layout.textFooter === false
+        ? { footerTemplate: null, marginBottom: layout.marginBottom ?? '40px' }
+        : this.footers.build({
+            localization: context,
+            title: layout.footerTitle,
+            marginBottom: layout.marginBottom,
+          });
 
     const html = await this.templates.render(input.templatePath, {
       ...validated.data,
