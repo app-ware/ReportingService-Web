@@ -30,14 +30,16 @@ export class ReceiptReportsService {
 
         return {
           format: isCompact ? 'A5' : 'A4',
+          // A5 is a half sheet printed landscape, as the legacy receipt was; portrait left
+          // half the page empty.
+          landscape: isCompact,
           margin: isCompact
             ? { top: '15px', right: '15px', left: '15px' }
             : { top: '25px', right: '25px', left: '25px' },
           footerTitle: context.labels.report.footerTitle ?? 'Receipt',
-          // A5 has no room for a banner footer, so it keeps the text footer and a tight margin.
-          includeFooter: isCompact ? false : data.settings?.includeFooter,
-          footerImageBase64: isCompact ? null : data.settings?.footerImageBase64,
-          defaultMarginBottom: isCompact ? '30px' : '40px',
+          // A5 has no room for a footer banner (the template omits it), so it keeps the text
+          // footer and a tight margin.
+          marginBottom: isCompact ? '30px' : '40px',
         };
       },
     });

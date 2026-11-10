@@ -1,10 +1,7 @@
 import { PinoLogger } from 'nestjs-pino';
-import { ReportFooterBuilder, escapeHtml, footerBannerMaxHeight } from './report-footer.builder';
+import { ReportFooterBuilder, escapeHtml } from './report-footer.builder';
 import { LocalizedReportContext } from './report-localization.service';
-import { buildReportRuntimeConfig } from 'src/config/report.config';
 
-const PNG =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==';
 
 function fakeLogger(): PinoLogger {
   return {
@@ -35,7 +32,7 @@ describe('ReportFooterBuilder', () => {
 
   beforeEach(() => {
     logger = fakeLogger();
-    builder = new ReportFooterBuilder(logger, buildReportRuntimeConfig({}));
+    builder = new ReportFooterBuilder(logger);
   });
 
   it('renders a text footer with page numbering and the default bottom margin', () => {
@@ -65,93 +62,23 @@ describe('ReportFooterBuilder', () => {
     expect(footerTemplate).toContain('text-align: left;');
   });
 
-  it('embeds a valid footer banner and widens the bottom margin for it', () => {
-    const { footerTemplate, marginBottom } = builder.build({
-      localization: context('en'),
-      title: 'Invoice Report',
-      includeFooter: true,
-      footerImageBase64: PNG,
-    });
-
-    expect(footerTemplate).toContain(`src="${PNG}"`);
-    expect(marginBottom).toBe('140px');
-  });
-
-  it('caps the footer banner to the bottom margin so any aspect ratio fits unclipped', () => {
-    const { footerTemplate } = builder.build({
-      localization: context('en'),
-      title: 'Receipt',
-      includeFooter: true,
-      footerImageBase64: PNG,
-      bannerMarginBottom: '160px',
-    });
-
-    expect(footerTemplate).toContain('max-height: 120px;');
-    expect(footerTemplate).toContain('object-fit: contain;');
-  });
-
-  it.each([
-    ['140px', 100],
-    ['20px', 0],
-    ['3cm', 100],
-  ])('derives the footer banner height from a %s margin', (margin, expected) => {
-    expect(footerBannerMaxHeight(margin)).toBe(expected);
-  });
-
   it('honours per-report margin overrides', () => {
     const { marginBottom } = builder.build({
       localization: context('en'),
       title: 'Receipt',
-      defaultMarginBottom: '30px',
+      marginBottom: '30px',
     });
 
     expect(marginBottom).toBe('30px');
   });
 
-  describe('footer image safety', () => {
-    it.each([
-      ['a javascript: URL', 'javascript:alert(1)'],
-      ['an http: URL', 'http://evil.example/banner.png'],
-      ['a file: URL', 'file:///etc/passwd'],
-      ['an HTML data URI', 'data:text/html;base64,PHNjcmlwdD4='],
-      ['an SVG data URI', 'data:image/svg+xml;base64,PHN2Zy8+'],
-    ])('drops %s and falls back to the text footer', (_label, footerImageBase64) => {
-      const { footerTemplate, marginBottom } = builder.build({
-        localization: context('en'),
-        title: 'Invoice Report',
-        includeFooter: true,
-        footerImageBase64,
-      });
-
-      expect(footerTemplate).not.toContain('<img');
-      expect(footerTemplate).not.toContain(footerImageBase64);
-      expect(marginBottom).toBe('40px');
-      expect(logger.warn).toHaveBeenCalled();
+  it('never draws an image in the per-page footer — the banner is printed once in the body', () => {
+    const { footerTemplate } = builder.build({
+      localization: context('en'),
+      title: 'Invoice Report',
     });
 
-    it('omits the banner when the center did not opt in, even with an image present', () => {
-      const { footerTemplate } = builder.build({
-        localization: context('en'),
-        title: 'Invoice Report',
-        includeFooter: false,
-        footerImageBase64: PNG,
-      });
-
-      expect(footerTemplate).not.toContain('<img');
-    });
-
-    it('drops an oversized banner', () => {
-      const tight = new ReportFooterBuilder(logger, { ...buildReportRuntimeConfig({}), maxImageBytes: 16 });
-
-      const { footerTemplate } = tight.build({
-        localization: context('en'),
-        title: 'Invoice Report',
-        includeFooter: true,
-        footerImageBase64: PNG,
-      });
-
-      expect(footerTemplate).not.toContain('<img');
-    });
+    expect(footerTemplate).not.toContain('<img');
   });
 
   describe('escaping', () => {

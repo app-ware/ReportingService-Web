@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" dir="{{dir}}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{labels.report.documentTitle}} - {{installment.studentName}}</title>
+    <style>
+        {{{fontFaceCss}}}
+
+        body {
+            font-family: {{fontStack}};
+            font-size: 10pt;
+        }
+
+{{> report-layout-styles}}
+
+        .banner-rule {
+            border: 0;
+            border-top: 2px solid #000;
+            margin: 0 0 12px;
+        }
+
+        /* Two columns of label + value pairs, in the legacy slip's order. */
+        .slip-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 24px;
+        }
+
+        .slip-grid .field {
+            display: flex;
+            gap: 12px;
+            align-items: baseline;
+        }
+
+        .slip-grid .field strong {
+            flex: 0 0 auto;
+            min-width: 70px;
+        }
+
+        /* See invoice-report.hbs: an amount keeps LTR ordering so bidi cannot rearrange it. */
+        .amount {
+            direction: ltr;
+            unicode-bidi: embed;
+            white-space: nowrap;
+        }
+
+        .amount-words {
+            margin: 14px 0 0;
+        }
+
+        .position {
+            margin: 8px 0 0;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="compact">
+
+<div class="page-fill">
+
+    {{> report-banner}}
+    <hr class="banner-rule" />
+
+    <div class="slip-grid">
+        <div class="field"><strong>{{labels.report.parent}}</strong> <span>{{installment.parentName}}</span></div>
+        <div class="field"><strong>{{labels.report.spouse}}</strong> <span>{{installment.spouseName}}</span></div>
+
+        <div class="field"><strong>{{labels.report.student}}</strong> <span>{{installment.studentName}}</span></div>
+        <div class="field"><strong>{{labels.report.studentId}}</strong> <span>{{installment.studentId}}</span></div>
+
+        <div class="field"><strong>{{labels.report.class}}</strong> <span>{{installment.className}}</span></div>
+        <div class="field"><strong>{{labels.report.academicYear}}</strong> <span>{{installment.academicYearTitle}}</span></div>
+
+        <div class="field"><strong>{{labels.report.dueDate}}</strong> <span>{{installment.dueDate}}</span></div>
+        <div class="field"><strong>{{labels.report.issueDate}}</strong> <span>{{installment.issueDate}}</span></div>
+
+        <div class="field">
+            <strong>{{labels.report.amount}}</strong>
+            <span class="amount">{{installment.amount}} <strong>{{installment.currencyCode}}</strong></span>
+        </div>
+        <div class="field">
+            <strong>{{labels.report.status}}</strong>
+            <span>{{#if (eq installment.status 'paid')}}{{labels.report.statusPaid}}{{else if (eq installment.status 'cancelled')}}{{labels.report.statusCancelled}}{{else}}{{labels.report.statusPending}}{{/if}}</span>
+        </div>
+    </div>
+
+    <p class="amount-words"><strong>{{installment.amountInWords}}</strong></p>
+
+    <p class="position"><span class="amount">{{installment.number}} / {{installment.count}}</span></p>
+
+    <div class="page-fill-spacer"></div>
+
+    {{! The bottom image: the Invoice footer banner, the same partial as the invoice report. }}
+    {{> report-footer-banner}}
+
+</div>
+
+</body>
+
+</html>

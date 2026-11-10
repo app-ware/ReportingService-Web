@@ -12,7 +12,7 @@
             font-size: 10pt;
         }
 
-{{> report-banner-styles}}
+{{> report-layout-styles}}
 
         .center-header {
             display: flex;
@@ -108,6 +108,8 @@
 
 <body class="{{#if (eq settings.reportSize 'A5')}}compact{{/if}}">
 
+<div class="page-fill">
+
     {{> report-banner}}
 
     <div class="center-header">
@@ -170,10 +172,18 @@
         {{/if}}
     </div>
 
+    <div class="page-fill-spacer"></div>
+
     <div class="signatures">
         <span>{{labels.report.parentSignature}}</span>
         <span>{{labels.report.accountantSignature}}</span>
     </div>
+
+    {{#unless (eq settings.reportSize 'A5')}}
+    {{> report-footer-banner}}
+    {{/unless}}
+
+</div>
 
 </body>
 
