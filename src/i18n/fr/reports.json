@@ -84,5 +84,22 @@
     "netIncome": "Salaire net :",
     "employeeSignature": "Signature de l'employé",
     "accountantSignature": "Signature du comptable"
+  },
+  "installment": {
+    "documentTitle": "Échéance",
+    "footerTitle": "Échéance",
+    "parent": "Parent :",
+    "spouse": "Conjoint :",
+    "student": "Élève :",
+    "studentId": "Identifiant de l'élève :",
+    "class": "Classe :",
+    "academicYear": "Année scolaire :",
+    "dueDate": "Date d'échéance :",
+    "issueDate": "Date d'émission :",
+    "amount": "Montant :",
+    "status": "Statut :",
+    "statusPaid": "Payé",
+    "statusPending": "En attente",
+    "statusCancelled": "Annulé"
   }
 }

@@ -84,5 +84,22 @@
     "netIncome": "صافي الراتب:",
     "employeeSignature": "توقيع الموظف",
     "accountantSignature": "توقيع المحاسب"
+  },
+  "installment": {
+    "documentTitle": "قسط",
+    "footerTitle": "قسط",
+    "parent": "ولي الأمر:",
+    "spouse": "الزوج/الزوجة:",
+    "student": "الطالب:",
+    "studentId": "رقم الطالب:",
+    "class": "الصف:",
+    "academicYear": "العام الدراسي:",
+    "dueDate": "تاريخ الاستحقاق:",
+    "issueDate": "تاريخ الإصدار:",
+    "amount": "المبلغ:",
+    "status": "الحالة:",
+    "statusPaid": "مدفوع",
+    "statusPending": "قيد الانتظار",
+    "statusCancelled": "ملغى"
   }
 }

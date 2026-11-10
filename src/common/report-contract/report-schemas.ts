@@ -252,7 +252,39 @@ export const evaluationReportSchema: ObjectSpec = obj({
   globalRemark: str({ nullable: true, maxLength: LONG_TEXT }),
 });
 
-export type ReportType = 'evaluation' | 'incident' | 'invoice' | 'receipt' | 'payslip';
+// ---------------------------------------------------------------------------
+// Installment slip
+// ---------------------------------------------------------------------------
+
+/**
+ * One installment of a tuition invoice. There is deliberately no `center` block: the
+ * legacy slip prints no center name, address, phone or logo, only the Invoice banners.
+ * `status` is a value, not a label; the template localizes it.
+ */
+export const installmentReportSchema: ObjectSpec = obj({
+  settings: obj(bannerSettings, { required: true }),
+  installment: obj(
+    {
+      parentName: str({ nullable: true, maxLength: SHORT_TEXT }),
+      spouseName: str({ nullable: true, maxLength: SHORT_TEXT }),
+      studentName: str({ required: true, maxLength: SHORT_TEXT }),
+      studentId: num({ required: true, integer: true, min: 0 }),
+      className: str({ nullable: true, maxLength: SHORT_TEXT }),
+      academicYearTitle: str({ nullable: true, maxLength: SHORT_TEXT }),
+      dueDate: str({ required: true, maxLength: 64 }),
+      issueDate: str({ required: true, maxLength: 64 }),
+      amount: str({ required: true, maxLength: 64 }),
+      currencyCode: str({ required: true, maxLength: 16 }),
+      amountInWords: str({ required: true, maxLength: 1_000 }),
+      status: str({ required: true, enum: ['paid', 'pending', 'cancelled'] }),
+      number: num({ required: true, integer: true, min: 1 }),
+      count: num({ required: true, integer: true, min: 1 }),
+    },
+    { required: true },
+  ),
+});
+
+export type ReportType = 'evaluation' | 'incident' | 'invoice' | 'receipt' | 'payslip' | 'installment';
 
 export const REPORT_SCHEMAS: Readonly<Record<ReportType, ObjectSpec>> = {
   evaluation: evaluationReportSchema,
@@ -260,4 +292,5 @@ export const REPORT_SCHEMAS: Readonly<Record<ReportType, ObjectSpec>> = {
   invoice: invoiceReportSchema,
   receipt: receiptReportSchema,
   payslip: paySlipReportSchema,
+  installment: installmentReportSchema,
 };

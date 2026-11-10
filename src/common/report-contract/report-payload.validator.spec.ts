@@ -2,7 +2,7 @@ import { BadRequestException, PayloadTooLargeException } from '@nestjs/common';
 import { ReportPayloadValidator } from './report-payload.validator';
 import { ReportRuntimeConfig, buildReportRuntimeConfig } from 'src/config/report.config';
 import { IncidentReportTemplateData } from 'src/modules/incident-report/dto/template-data.interface';
-import { paySlipFixture } from './test-fixtures';
+import { installmentFixture, paySlipFixture } from './test-fixtures';
 
 const PNG =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==';
@@ -242,6 +242,36 @@ describe('ReportPayloadValidator', () => {
 
     it.each(['A3', 'a4', 'Letter', ''])('rejects reportSize %p', (reportSize) => {
       expect(() => validator.validate('receipt', receiptPayload({ reportSize }))).toThrow(BadRequestException);
+    });
+
+    it.each(['paid', 'pending', 'cancelled'])('accepts installment status %p', (status) => {
+      const validated = validator.validate<Record<string, any>>('installment', installmentFixture('en', { installment: { status } }));
+      expect(validated.data.installment.status).toBe(status);
+    });
+
+    it.each(['Paid', 'deleted', ''])('rejects installment status %p', (status) => {
+      expect(() => validator.validate('installment', installmentFixture('en', { installment: { status } }))).toThrow(BadRequestException);
+    });
+  });
+
+  describe('installment slip', () => {
+    it('accepts a slip without a center block and with no images', () => {
+      const payload = installmentFixture('en', {
+        settings: { useImages: false, includeFooter: false, headerImageBase64: null, footerImageBase64: null },
+      });
+
+      expect(() => validator.validate('installment', payload)).not.toThrow();
+    });
+
+    it.each(['useImages', 'includeFooter'])('rejects a missing settings.%s instead of guessing it', (flag) => {
+      const payload = installmentFixture('en') as Record<string, any>;
+      delete payload.settings[flag];
+
+      expect(() => validator.validate('installment', payload)).toThrow(BadRequestException);
+    });
+
+    it('rejects a position of 0', () => {
+      expect(() => validator.validate('installment', installmentFixture('en', { installment: { number: 0 } }))).toThrow(BadRequestException);
     });
   });
 

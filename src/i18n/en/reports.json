@@ -84,5 +84,22 @@
     "netIncome": "Net Income:",
     "employeeSignature": "Employee Signature",
     "accountantSignature": "Accountant Signature"
+  },
+  "installment": {
+    "documentTitle": "Installment",
+    "footerTitle": "Installment",
+    "parent": "Parent :",
+    "spouse": "Spouse :",
+    "student": "Student :",
+    "studentId": "Student ID:",
+    "class": "Class :",
+    "academicYear": "Academic Year :",
+    "dueDate": "Due Date :",
+    "issueDate": "Issue Date:",
+    "amount": "Amount :",
+    "status": "Status :",
+    "statusPaid": "Paid",
+    "statusPending": "Pending",
+    "statusCancelled": "Cancelled"
   }
 }

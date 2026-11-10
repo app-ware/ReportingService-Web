@@ -27,12 +27,10 @@ export class EvaluationReportsService {
       templatePath: 'evaluation-reports/evaluation-report.hbs',
       validated,
       correlationId,
-      layout: (context, data) => ({
+      layout: (context) => ({
         format: 'A4',
         margin: { top: '25px', right: '25px', left: '25px' },
         footerTitle: context.labels.report.documentTitle ?? 'Evaluation Report',
-        includeFooter: data.settings?.includeFooter,
-        footerImageBase64: (data.settings as { footerImageBase64?: string | null })?.footerImageBase64,
       }),
     });
   }
