@@ -10,6 +10,16 @@ export interface InvoiceReportTemplateData {
     includeFooter: boolean;
     headerImageBase64: string | null;
     footerImageBase64: string | null;
+    /** Shared receipt/invoice report variants; optional for older version-1 callers. */
+    fineprintMessage?: string | null;
+    fineprintVisible?: boolean | null;
+    footerMessage?: string | null;
+    footerVisible?: boolean | null;
+    signatures?: Array<{
+      slot?: number | null;
+      visible?: boolean | null;
+      note?: string | null;
+    }> | null;
   };
   invoice: {
     invoiceNumber: number | null;

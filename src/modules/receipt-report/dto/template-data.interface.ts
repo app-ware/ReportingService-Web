@@ -11,6 +11,16 @@ export interface ReceiptReportTemplateData {
     headerImageBase64: string | null;
     footerImageBase64: string | null;
     reportSize: 'A4' | 'A5';
+    /** Shared receipt/invoice report variants; optional for older version-1 callers. */
+    fineprintMessage?: string | null;
+    fineprintVisible?: boolean | null;
+    footerMessage?: string | null;
+    footerVisible?: boolean | null;
+    signatures?: Array<{
+      slot?: number | null;
+      visible?: boolean | null;
+      note?: string | null;
+    }> | null;
   };
   receipt: {
     receiptNumber: number | null;

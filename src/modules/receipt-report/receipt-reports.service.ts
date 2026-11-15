@@ -15,7 +15,7 @@ export class ReceiptReportsService {
    *
    * The receipt is the one report with two page geometries: centers configure A4 or A5 in
    * `Center_Printable_Report_Sizes`, and Nursery resolves that into `settings.reportSize`.
-   * The compact layout tightens margins and drops the footer banner allowance.
+   * The compact layout uses landscape A5 with tighter page margins.
    */
   async createPdfFromData(rawPayload: unknown, correlationId?: string): Promise<Buffer> {
     const validated = this.validator.validate<ReceiptReportTemplateData>('receipt', rawPayload);
@@ -37,9 +37,10 @@ export class ReceiptReportsService {
             ? { top: '15px', right: '15px', left: '15px' }
             : { top: '25px', right: '25px', left: '25px' },
           footerTitle: context.labels.report.footerTitle ?? 'Receipt',
-          // A5 has no room for a footer banner (the template omits it), so it keeps the text
-          // footer and a tight margin.
-          marginBottom: isCompact ? '30px' : '40px',
+          // Old iCare puts the configurable footer below the signatures and has no
+          // generated date/title/page number strip.
+          textFooter: false,
+          marginBottom: isCompact ? '15px' : '25px',
         };
       },
     });

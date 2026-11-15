@@ -9,6 +9,8 @@
  * (504-mapped) rather than a client-side abort.
  */
 export interface ReportRuntimeConfig {
+  /** Optional browser binary override; otherwise Playwright then an installed system browser is used. */
+  browserExecutablePath: string | null;
   /** Hard ceiling on a single HTML -> PDF render, in milliseconds. */
   renderTimeoutMs: number;
   /** How many renders may hold a browser context at the same time. */
@@ -24,6 +26,7 @@ export interface ReportRuntimeConfig {
 }
 
 const DEFAULTS: ReportRuntimeConfig = {
+  browserExecutablePath: null,
   renderTimeoutMs: 20_000,
   maxConcurrentRenders: 2,
   maxQueueDepth: 10,
@@ -33,7 +36,15 @@ const DEFAULTS: ReportRuntimeConfig = {
 };
 
 /** Bounds that keep a typo in the environment from disabling a protection outright. */
-const BOUNDS: Record<keyof ReportRuntimeConfig, { min: number; max: number }> = {
+type NumericReportRuntimeConfigKey = Exclude<
+  keyof ReportRuntimeConfig,
+  'browserExecutablePath'
+>;
+
+const BOUNDS: Record<
+  NumericReportRuntimeConfigKey,
+  { min: number; max: number }
+> = {
   renderTimeoutMs: { min: 1_000, max: 120_000 },
   maxConcurrentRenders: { min: 1, max: 32 },
   maxQueueDepth: { min: 0, max: 1_000 },
@@ -43,7 +54,7 @@ const BOUNDS: Record<keyof ReportRuntimeConfig, { min: number; max: number }> = 
 };
 
 function readNumber(
-  key: keyof ReportRuntimeConfig,
+  key: NumericReportRuntimeConfigKey,
   envName: string,
   env: NodeJS.ProcessEnv,
 ): number {
@@ -63,13 +74,33 @@ function readNumber(
 
 export const REPORT_RUNTIME_CONFIG = 'REPORT_RUNTIME_CONFIG';
 
-export function buildReportRuntimeConfig(env: NodeJS.ProcessEnv = process.env): ReportRuntimeConfig {
+export function buildReportRuntimeConfig(
+  env: NodeJS.ProcessEnv = process.env,
+): ReportRuntimeConfig {
+  const configuredBrowserPath = env.REPORT_BROWSER_EXECUTABLE_PATH?.trim();
   return {
-    renderTimeoutMs: readNumber('renderTimeoutMs', 'REPORT_RENDER_TIMEOUT_MS', env),
-    maxConcurrentRenders: readNumber('maxConcurrentRenders', 'REPORT_MAX_CONCURRENT_RENDERS', env),
+    browserExecutablePath: configuredBrowserPath || null,
+    renderTimeoutMs: readNumber(
+      'renderTimeoutMs',
+      'REPORT_RENDER_TIMEOUT_MS',
+      env,
+    ),
+    maxConcurrentRenders: readNumber(
+      'maxConcurrentRenders',
+      'REPORT_MAX_CONCURRENT_RENDERS',
+      env,
+    ),
     maxQueueDepth: readNumber('maxQueueDepth', 'REPORT_MAX_QUEUE_DEPTH', env),
-    queueTimeoutMs: readNumber('queueTimeoutMs', 'REPORT_QUEUE_TIMEOUT_MS', env),
-    maxPayloadBytes: readNumber('maxPayloadBytes', 'REPORT_MAX_PAYLOAD_BYTES', env),
+    queueTimeoutMs: readNumber(
+      'queueTimeoutMs',
+      'REPORT_QUEUE_TIMEOUT_MS',
+      env,
+    ),
+    maxPayloadBytes: readNumber(
+      'maxPayloadBytes',
+      'REPORT_MAX_PAYLOAD_BYTES',
+      env,
+    ),
     maxImageBytes: readNumber('maxImageBytes', 'REPORT_MAX_IMAGE_BYTES', env),
   };
 }
