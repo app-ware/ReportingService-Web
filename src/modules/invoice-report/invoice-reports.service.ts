@@ -29,6 +29,10 @@ export class InvoiceReportsService {
         format: 'A4',
         margin: { top: '25px', right: '25px', left: '25px' },
         footerTitle: context.labels.report.footerTitle ?? 'Invoice Report',
+        // The legacy accounting reports have their configured footer in the body; they
+        // do not print Chromium's date/title/page-number footer beneath it.
+        textFooter: false,
+        marginBottom: '25px',
       }),
     });
   }

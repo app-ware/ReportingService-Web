@@ -31,6 +31,29 @@ const bannerSettings = {
   footerImageBase64: image({ nullable: true }),
 };
 
+/**
+ * Receipt and invoice share the legacy accounting-report variants. `slot` keeps a
+ * disabled/missing signature from shifting the remaining captions to the left.
+ *
+ * Every field is optional for version-1 compatibility: older Nursery deployments do
+ * not send this block yet. New callers send all four slots explicitly.
+ */
+const accountingReportSettings = {
+  fineprintMessage: str({ nullable: true, maxLength: LONG_TEXT }),
+  fineprintVisible: bool({ nullable: true }),
+  footerMessage: str({ nullable: true, maxLength: 1_000 }),
+  footerVisible: bool({ nullable: true }),
+  signatures: arr(
+    obj({
+      slot: num({ nullable: true, integer: true, min: 1, max: 4 }),
+      visible: bool({ nullable: true }),
+      note: str({ nullable: true, maxLength: SHORT_TEXT }),
+    }),
+    4,
+    { nullable: true },
+  ),
+};
+
 // ---------------------------------------------------------------------------
 // Incident
 // ---------------------------------------------------------------------------
@@ -38,7 +61,10 @@ const bannerSettings = {
 export const incidentReportSchema: ObjectSpec = obj({
   center: centerSpec,
   settings: obj(bannerSettings, { required: true }),
-  student: obj({ name: str({ required: true, maxLength: SHORT_TEXT }) }, { required: true }),
+  student: obj(
+    { name: str({ required: true, maxLength: SHORT_TEXT }) },
+    { required: true },
+  ),
   incident: obj(
     {
       date: str({ required: true, maxLength: 64 }),
@@ -61,7 +87,10 @@ export const incidentReportSchema: ObjectSpec = obj({
 
 export const invoiceReportSchema: ObjectSpec = obj({
   center: centerSpec,
-  settings: obj(bannerSettings, { required: true }),
+  settings: obj(
+    { ...bannerSettings, ...accountingReportSettings },
+    { required: true },
+  ),
   invoice: obj(
     {
       invoiceNumber: num({ nullable: true, integer: true, min: 0 }),
@@ -106,6 +135,7 @@ export const receiptReportSchema: ObjectSpec = obj({
   settings: obj(
     {
       ...bannerSettings,
+      ...accountingReportSettings,
       reportSize: str({ required: true, enum: ['A4', 'A5'] }),
     },
     { required: true },
@@ -173,7 +203,9 @@ const evaluationNodeSpec: ObjectSpec = obj({
   title: str({ nullable: true, maxLength: SHORT_TEXT }),
   level: num({ required: true, integer: true, min: 1, max: 4 }),
   remark: str({ nullable: true, maxLength: LONG_TEXT }),
-  values: arr(obj({ value: str({ nullable: true, maxLength: 64 }) }), 8, { nullable: true }),
+  values: arr(obj({ value: str({ nullable: true, maxLength: 64 }) }), 8, {
+    nullable: true,
+  }),
   children: arr(() => evaluationNodeSpec, 500, { nullable: true }),
 });
 
@@ -239,7 +271,11 @@ export const evaluationReportSchema: ObjectSpec = obj({
     { required: true },
   ),
   variants: evaluationVariantsSpec,
-  terms: arr(obj({ title: str({ nullable: true, maxLength: SHORT_TEXT }) }), 8, { required: true }),
+  terms: arr(
+    obj({ title: str({ nullable: true, maxLength: SHORT_TEXT }) }),
+    8,
+    { required: true },
+  ),
   nodes: arr(evaluationNodeSpec, 2_000, { required: true }),
   legend: arr(
     obj({
@@ -284,7 +320,13 @@ export const installmentReportSchema: ObjectSpec = obj({
   ),
 });
 
-export type ReportType = 'evaluation' | 'incident' | 'invoice' | 'receipt' | 'payslip' | 'installment';
+export type ReportType =
+  | 'evaluation'
+  | 'incident'
+  | 'invoice'
+  | 'receipt'
+  | 'payslip'
+  | 'installment';
 
 export const REPORT_SCHEMAS: Readonly<Record<ReportType, ObjectSpec>> = {
   evaluation: evaluationReportSchema,
