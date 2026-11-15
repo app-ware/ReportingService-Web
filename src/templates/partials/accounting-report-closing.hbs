@@ -29,7 +29,12 @@
         {{/if}}
     {{/if}}
 
-    {{#if settings.includeFooter}}
+    {{! hideFooterImage: the A5 receipt, where legacy prints the text footer even with a footer image set. }}
+    {{#if hideFooterImage}}
+        {{#unless (eq settings.footerVisible false)}}
+        <p class="accounting-footer-message">{{label settings.footerMessage "Thank You!"}}</p>
+        {{/unless}}
+    {{else if settings.includeFooter}}
         {{#if settings.footerImageBase64}}
             {{> report-footer-banner}}
         {{else}}

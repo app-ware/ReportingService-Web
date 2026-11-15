@@ -457,6 +457,23 @@ describe('Report rendering (integration, real Chromium)', () => {
       },
     );
 
+    it('A5 receipt prints the text footer instead of the footer image, as legacy does', async () => {
+      const settings = {
+        includeFooter: true,
+        footerImageBase64: TINY_PNG,
+        footerMessage: 'Thank you! 123',
+      };
+      const a5 = await html('receipt', { ...settings, reportSize: 'A5' });
+      expect(a5).not.toContain('class="report-footer-banner"');
+      expect(a5).toContain('>Thank you! 123</p>');
+      expect(
+        await html('receipt', { ...settings, reportSize: 'A5', footerVisible: false }),
+      ).not.toContain('class="accounting-footer-message"');
+      expect(await html('receipt', { ...settings, reportSize: 'A4' })).toContain(
+        'class="report-footer-banner"',
+      );
+    });
+
     it.each(['invoice', 'receipt'] as const)(
       'renders four fixed signature slots on one short %s',
       async (reportType) => {
