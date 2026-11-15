@@ -80,17 +80,6 @@
             margin: 4px 0 0;
         }
 
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 60px;
-            padding: 0 20px;
-        }
-
-        .signatures span {
-            font-weight: bold;
-        }
-
         body.compact {
             font-size: 8pt;
         }
@@ -100,9 +89,6 @@
             height: 50px;
         }
 
-        body.compact .signatures {
-            margin-top: 30px;
-        }
     </style>
 </head>
 
@@ -174,14 +160,7 @@
 
     <div class="page-fill-spacer"></div>
 
-    <div class="signatures">
-        <span>{{labels.report.parentSignature}}</span>
-        <span>{{labels.report.accountantSignature}}</span>
-    </div>
-
-    {{#unless (eq settings.reportSize 'A5')}}
-    {{> report-footer-banner}}
-    {{/unless}}
+    {{> accounting-report-closing receiptDefaults=true}}
 
 </div>
 

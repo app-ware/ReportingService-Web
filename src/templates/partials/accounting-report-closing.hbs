@@ -1,0 +1,45 @@
+<div class="accounting-report-closing">
+    {{#unless (eq settings.fineprintVisible false)}}
+        {{#if settings.fineprintMessage}}
+        <p class="accounting-fineprint">{{settings.fineprintMessage}}</p>
+        {{/if}}
+    {{/unless}}
+
+    {{#if settings.signatures}}
+    <div class="accounting-signatures">
+        {{#each settings.signatures}}
+        <div class="accounting-signature" {{#if slot}}style="grid-column: {{slot}};"{{/if}}>
+            {{#unless (eq visible false)}}
+                {{#if note}}<div class="accounting-signature-note">{{note}}</div>{{/if}}
+            {{/unless}}
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+        {{#if receiptDefaults}}
+        {{! Preserve the two-caption receipt produced for older version-1 payloads. }}
+        <div class="accounting-signatures accounting-signatures-default">
+            <div class="accounting-signature" style="grid-column: 1;">
+                <div class="accounting-signature-note">{{labels.report.parentSignature}}</div>
+            </div>
+            <div class="accounting-signature" style="grid-column: 4;">
+                <div class="accounting-signature-note">{{labels.report.accountantSignature}}</div>
+            </div>
+        </div>
+        {{/if}}
+    {{/if}}
+
+    {{#if settings.includeFooter}}
+        {{#if settings.footerImageBase64}}
+            {{> report-footer-banner}}
+        {{else}}
+            {{#unless (eq settings.footerVisible false)}}
+            <p class="accounting-footer-message">{{label settings.footerMessage "Thank You!"}}</p>
+            {{/unless}}
+        {{/if}}
+    {{else}}
+        {{#unless (eq settings.footerVisible false)}}
+        <p class="accounting-footer-message">{{label settings.footerMessage "Thank You!"}}</p>
+        {{/unless}}
+    {{/if}}
+</div>
