@@ -516,6 +516,11 @@ describe('Report rendering (integration, real Chromium)', () => {
           return {
             slotLefts: slots.map((slot) => slot.getBoundingClientRect().left),
             hiddenText: slots[1].textContent?.trim(),
+            signaturePaddingBottom: Number.parseFloat(
+              getComputedStyle(
+                document.querySelector('.accounting-signatures')!,
+              ).paddingBottom,
+            ),
             borderTop: getComputedStyle(
               document.querySelector('.accounting-footer-message')!,
             ).borderTopWidth,
@@ -528,9 +533,12 @@ describe('Report rendering (integration, real Chromium)', () => {
         expect(measurements.slotLefts).toHaveLength(4);
         expect(new Set(measurements.slotLefts).size).toBe(4);
         expect(measurements.hiddenText).toBe('');
+        expect(measurements.signaturePaddingBottom).toBe(64);
         expect(measurements.borderTop).not.toBe('0px');
         for (const noteBottom of measurements.noteBottoms) {
-          expect(measurements.footerTop).toBeGreaterThan(noteBottom);
+          expect(measurements.footerTop - noteBottom).toBeGreaterThanOrEqual(
+            measurements.signaturePaddingBottom,
+          );
         }
       } finally {
         await context.close();
@@ -651,6 +659,61 @@ describe('Report rendering (integration, real Chromium)', () => {
         }
       },
     );
+
+    it('expands 1600x230 header and footer images to the A5 printable width', async () => {
+      const wideBanner = solidPng(1600, 230);
+      const fixture = installmentFixture('en', {
+        settings: {
+          useImages: true,
+          includeFooter: true,
+          headerImageBase64: wideBanner,
+          footerImageBase64: wideBanner,
+        },
+      });
+      const validated = validator.validate('installment', fixture);
+      const context = localization.contextFor(
+        'installment',
+        validated.locale,
+      );
+      const markup = await templates.render(TEMPLATE_PATHS.installment, {
+        ...(validated.data as object),
+        lang: context.locale,
+        dir: context.dir,
+        isRtl: context.isRtl,
+        labels: context.labels,
+        fontFaceCss: fonts.fontFaceCss(),
+        fontStack: fonts.fontStack(),
+        pageFillHeight: '390px',
+      });
+
+      const browserContext = await browsers.newContext();
+      try {
+        const page = await browserContext.newPage();
+        // A5 landscape at 96dpi minus the service's 15px left/right PDF margins.
+        await page.setViewportSize({ width: 764, height: 420 });
+        await page.setContent(markup, { waitUntil: 'load' });
+        const boxes = await page.evaluate(() =>
+          ['.report-banner', '.report-footer-banner'].map((selector) => {
+            const container = document.querySelector(selector)!;
+            const image = container.querySelector('img')!;
+            return {
+              containerWidth: container.getBoundingClientRect().width,
+              imageWidth: image.getBoundingClientRect().width,
+              imageHeight: image.getBoundingClientRect().height,
+            };
+          }),
+        );
+
+        for (const box of boxes) {
+          expect(Math.abs(box.containerWidth - box.imageWidth)).toBeLessThan(
+            1,
+          );
+          expect(box.imageHeight).toBeLessThanOrEqual(110.5);
+        }
+      } finally {
+        await browserContext.close();
+      }
+    });
   });
 
   /**
