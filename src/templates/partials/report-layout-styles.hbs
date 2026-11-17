@@ -21,6 +21,15 @@
             max-height: 70px;
         }
 
+        body.compact.installment-slip .report-banner img {
+            /*
+             * Printable-report images are uploaded at 1600x230. At A5 landscape width
+             * they need roughly 108px of height to keep their aspect ratio and reach
+             * both sides of the installment slip. The compact 70px cap reduced the width.
+             */
+            max-height: 110px;
+        }
+
         /*
          * A short report fills its page: the spacer takes the leftover height, so the
          * signatures and the footer banner sit at the bottom of the page instead of
@@ -52,6 +61,11 @@
             object-fit: contain;
         }
 
+        body.compact.installment-slip .report-footer-banner img {
+            /* Match the full-width A5 installment treatment used by the header banner. */
+            max-height: 110px;
+        }
+
         /*
          * Receipt and invoice use the same four fixed legacy text-signature positions.
          * A hidden slot stays in its column instead of making later captions shift.
@@ -77,6 +91,12 @@
             gap: 16px;
             align-items: end;
             margin-top: 28px;
+            /*
+             * Keep a writable area below the labels. Because the closing block is
+             * anchored at the bottom of a short report, this padding moves the labels
+             * upward while leaving room for a handwritten signature.
+             */
+            padding-bottom: 64px;
         }
 
         .accounting-signature {
@@ -99,4 +119,6 @@
         body.compact .accounting-signatures {
             gap: 10px;
             margin-top: 18px;
+            /* Preserve the tight one-page A5 receipt layout. */
+            padding-bottom: 0;
         }
